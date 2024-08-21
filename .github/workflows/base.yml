@@ -53,7 +53,7 @@ jobs:
 
       - name: Create ZIP file
         run: |
-          cd pkg && zip -r millisearch.zip ./*
+          cd pkg && zip -r ../millisearch.zip ./*
 
       - name: Check for VERSION changes
         id: check_version
