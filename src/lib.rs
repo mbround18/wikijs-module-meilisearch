@@ -177,7 +177,7 @@ impl WikiSearchEngine {
         self.handle_document_operation(page, |page| async move {
             log::warn!("Deleting page: {}", page.id);
             let index = self.client.index(&self.index_name);
-            let filter = format!("path = {}", page.path);
+            let filter = format!("id = {}", page.id);
             let mut binding = DocumentDeletionQuery::new(&index);
             let query = binding.with_filter(&filter);
             index
