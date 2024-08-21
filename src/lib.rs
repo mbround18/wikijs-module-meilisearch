@@ -90,15 +90,15 @@ impl WikiSearchEngine {
 impl WikiSearchEngine {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        millisearch_host: String,
-        millisearch_api_key: String,
+        meilisearch_host: String,
+        meilisearch_api_key: String,
         index_name: String,
         _timeout: u64,
     ) -> Result<WikiSearchEngine, JsValue> {
-        WasmLogger::init("millisearch::WikiSearchEngine");
+        WasmLogger::init("meilisearch::WikiSearchEngine");
 
-        let host = millisearch_host.clone();
-        let client = Client::new(host.clone(), Some(millisearch_api_key))
+        let host = meilisearch_host.clone();
+        let client = Client::new(host.clone(), Some(meilisearch_api_key))
             .map_err(|e| WikiSearchEngine::log_and_return_js_error("Failed to create client", e))?;
 
         log::info!("WikiSearchEngine created with index: {}", index_name);

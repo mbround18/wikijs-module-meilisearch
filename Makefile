@@ -1,5 +1,5 @@
 # Variables
-PROJECT_NAME := wiki_millisearch
+PROJECT_NAME := wiki_meilisearch
 DOCKER_COMPOSE := docker-compose.yml
 PKG_DIR := pkg
 SOURCE_FILES := engine.js definition.yml

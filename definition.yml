@@ -1,23 +1,23 @@
-key: millisearch
-title: Millisearch Engine
+key: meilisearch
+title: Meilisearch Engine
 author: mbround18
 isAvailable: true
-logo: https://raw.githubusercontent.com/mbround18/wikijs-module-millisearch/main/docs/assets/logo.png
-website: https://github.com/mbround18/wikijs-module-millisearch
+logo: https://raw.githubusercontent.com/mbround18/wikijs-module-meilisearch/main/docs/assets/logo.png
+website: https://github.com/mbround18/wikijs-module-meilisearch
 props:
-  millisearchHost:
+  meilisearchHost:
     type: String
-    description: "The URL or IP address where the Millisearch server is hosted."
-    default: "http://millisearch:7700"
-  millisearchApiKey:
+    description: "The URL or IP address where the Meilisearch server is hosted."
+    default: "http://meilisearch:7700"
+  meilisearchApiKey:
     type: String
-    description: "API key for authenticating requests to the Millisearch server."
+    description: "API key for authenticating requests to the Meilisearch server."
     default: "demo"
   indexName:
     type: String
-    description: "The name of the index in Millisearch that will be used for the Wiki.js search."
+    description: "The name of the index in Meilisearch that will be used for the Wiki.js search."
     default: "wiki_index"
   timeout:
     type: Number
-    description: "Timeout for search requests in milliseconds."
+    description: "Timeout for search requests in meiliseconds."
     default: 5000

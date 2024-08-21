@@ -8,17 +8,17 @@ services:
     environment:
       DB_TYPE: sqlite
     volumes:
-      - ./pkg:/wiki/server/modules/search/millisearch
+      - ./pkg:/wiki/server/modules/search/meilisearch
       - ./tmp/wikijs:/wiki/data:rw
       - ./config/wiki.yml:/wiki/config.yml:r
     depends_on:
-      - millisearch
+      - meilisearch
     links:
-      - millisearch
+      - meilisearch
 
-  millisearch:
+  meilisearch:
     image: getmeili/meilisearch:v1.9
-    container_name: millisearch
+    container_name: meilisearch
     restart: always
     ports:
       - "7700:7700"
@@ -27,4 +27,4 @@ services:
       MEILI_NO_ANALYTICS: "true"
       MEILI_LOG_LEVEL: "DEBUG"
     volumes:
-      - ./tmp/millisearch:/meili_data
+      - ./tmp/meilisearch:/meili_data

@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 /**
- * @typedef {import("./pkg/millisearch")} wasm
+ * @typedef {import("./pkg/meilisearch")} wasm
  * @typedef {wasm.WikiSearchEngine} WikiSearchEngine
  */
 
@@ -29,7 +29,7 @@
 /**
  * @type {wasm}
  */
-const wasm = require("./millisearch.js");
+const wasm = require("./meilisearch.js");
 
 /**
  * @type {WikiSearchEngine}
@@ -43,31 +43,31 @@ let logger = WIKI.logger;
 
 /**
  *
- * @param millisearchHost
- * @param millisearchApiKey
+ * @param meilisearchHost
+ * @param meilisearchApiKey
  * @param indexName
  * @param timeout
  * @returns {Promise<WikiSearchEngine>}
  */
 async function getSearchEngine({
-  millisearchHost,
-  millisearchApiKey,
+  meilisearchHost,
+  meilisearchApiKey,
   indexName,
   timeout,
 }) {
   if (!wasm.WikiSearchEngine) {
     throw new Error(
-      `(SEARCH/MILLISEARCH) WikiSearchEngine is not defined. Make sure to add the search engine to your dependencies.`,
+      `(SEARCH/MEILISEARCH) WikiSearchEngine is not defined. Make sure to add the search engine to your dependencies.`,
     );
   }
 
   if (!searchEngine) {
     logger.info(
-      `(SEARCH/MILLISEARCH) Configuring search engine with host: ${millisearchHost}, index: ${indexName}`,
+      `(SEARCH/MEILISEARCH) Configuring search engine with host: ${meilisearchHost}, index: ${indexName}`,
     );
     searchEngine = await new wasm.WikiSearchEngine(
-      millisearchHost || "http://millisearch:7700",
-      millisearchApiKey || "demo",
+      meilisearchHost || "http://meilisearch:7700",
+      meilisearchApiKey || "demo",
       indexName || "wiki_index",
       BigInt(timeout || 5000),
     );
@@ -81,30 +81,30 @@ module.exports = {
    * ACTIVATE
    */
   async activate() {
-    logger.info(`(SEARCH/MILLISEARCH) Activating search engine...`);
+    logger.info(`(SEARCH/MEILISEARCH) Activating search engine...`);
     const engine = await getSearchEngine(this.config);
     // log all methods attached to engine
-    logger.info(`(SEARCH/MILLISEARCH) Engine methods: ${Object.keys(engine)}`);
+    logger.info(`(SEARCH/MEILISEARCH) Engine methods: ${Object.keys(engine)}`);
     await engine.activated();
-    logger.info(`(SEARCH/MILLISEARCH) Search engine activated.`);
+    logger.info(`(SEARCH/MEILISEARCH) Search engine activated.`);
   },
   /**
    * DEACTIVATE
    */
   async deactivate() {
-    logger.info(`(SEARCH/MILLISEARCH) Deactivating search engine...`);
+    logger.info(`(SEARCH/MEILISEARCH) Deactivating search engine...`);
     //     const engine = await getSearchEngine(this.config);
     // await engine.deactivated();
-    logger.info(`(SEARCH/MILLISEARCH) Search engine deactivated.`);
+    logger.info(`(SEARCH/MEILISEARCH) Search engine deactivated.`);
   },
   /**
    * INIT
    */
   async init() {
-    logger.info(`(SEARCH/MILLISEARCH) Initializing search engine...`);
+    logger.info(`(SEARCH/MEILISEARCH) Initializing search engine...`);
     const engine = await getSearchEngine(this.config);
     await engine.healthcheck();
-    logger.info(`(SEARCH/MILLISEARCH) Search engine initialized.`);
+    logger.info(`(SEARCH/MEILISEARCH) Search engine initialized.`);
   },
 
   /**
@@ -138,12 +138,12 @@ module.exports = {
   async query(q, opts) {
     try {
       logger.info(
-        `(SEARCH/MILLISEARCH) Querying search engine with query: ${q}`,
+        `(SEARCH/MEILISEARCH) Querying search engine with query: ${q}`,
       );
       const engine = await getSearchEngine(this.config);
       const results = (await engine.query(q)) || [];
       logger.info(
-        `(SEARCH/MILLISEARCH) Query returned ${results.length} results.`,
+        `(SEARCH/MEILISEARCH) Query returned ${results.length} results.`,
       );
       // locale is required for search but nowhere else. So we need to map it to localCode
       results.results = (results.results || []).map(
@@ -163,7 +163,7 @@ module.exports = {
       return results;
     } catch (err) {
       logger.warn(
-        `(SEARCH/MILLISEARCH) Query failed with error: ${err.message}`,
+        `(SEARCH/MEILISEARCH) Query failed with error: ${err.message}`,
       );
       throw err;
     }
@@ -176,15 +176,15 @@ module.exports = {
    */
   async suggest(q, opts) {
     try {
-      logger.info(`(SEARCH/MILLISEARCH) Fetching suggestions for query: ${q}`);
+      logger.info(`(SEARCH/MEILISEARCH) Fetching suggestions for query: ${q}`);
       const engine = await getSearchEngine(this.config);
       const suggestions = await engine.suggest(q, opts);
-      logger.info(`(SEARCH/MILLISEARCH) Suggestions fetched successfully.`);
+      logger.info(`(SEARCH/MEILISEARCH) Suggestions fetched successfully.`);
 
       return suggestions;
     } catch (err) {
       logger.warn(
-        `(SEARCH/MILLISEARCH) Suggest failed with error: ${err.message}`,
+        `(SEARCH/MEILISEARCH) Suggest failed with error: ${err.message}`,
       );
       throw err;
     }
@@ -196,12 +196,12 @@ module.exports = {
    */
   async created(page) {
     logger.info(
-      `(SEARCH/MILLISEARCH) Creating search index for page: ${page.path}`,
+      `(SEARCH/MEILISEARCH) Creating search index for page: ${page.path}`,
     );
     const engine = await getSearchEngine(this.config);
     await engine.created(page);
     logger.info(
-      `(SEARCH/MILLISEARCH) Search index created for page: ${page.path}`,
+      `(SEARCH/MEILISEARCH) Search index created for page: ${page.path}`,
     );
   },
   /**
@@ -211,12 +211,12 @@ module.exports = {
    */
   async updated(page) {
     logger.info(
-      `(SEARCH/MILLISEARCH) Updating search index for page: ${page.path}`,
+      `(SEARCH/MEILISEARCH) Updating search index for page: ${page.path}`,
     );
     const engine = await getSearchEngine(this.config);
     await engine.updated(page);
     logger.info(
-      `(SEARCH/MILLISEARCH) Search index updated for page: ${page.path}`,
+      `(SEARCH/MEILISEARCH) Search index updated for page: ${page.path}`,
     );
   },
   /**
@@ -226,12 +226,12 @@ module.exports = {
    */
   async deleted(page) {
     logger.info(
-      `(SEARCH/MILLISEARCH) Deleting search index for page: ${page.path}`,
+      `(SEARCH/MEILISEARCH) Deleting search index for page: ${page.path}`,
     );
     const engine = await getSearchEngine(this.config);
     await engine.deleted(page);
     logger.info(
-      `(SEARCH/MILLISEARCH) Search index deleted for page: ${page.path}`,
+      `(SEARCH/MEILISEARCH) Search index deleted for page: ${page.path}`,
     );
   },
   /**
@@ -241,19 +241,19 @@ module.exports = {
    */
   async renamed(page) {
     logger.info(
-      `(SEARCH/MILLISEARCH) Renaming search index for page: ${page.path}`,
+      `(SEARCH/MEILISEARCH) Renaming search index for page: ${page.path}`,
     );
     const engine = await getSearchEngine(this.config);
     await engine.updated(page);
     logger.info(
-      `(SEARCH/MILLISEARCH) Search index renamed for page: ${page.destinationPath}`,
+      `(SEARCH/MEILISEARCH) Search index renamed for page: ${page.destinationPath}`,
     );
   },
   /**
    * REBUILD INDEX
    */
   async rebuild() {
-    logger.info(`(SEARCH/MILLISEARCH) Rebuilding entire search index...`);
+    logger.info(`(SEARCH/MEILISEARCH) Rebuilding entire search index...`);
     const engine = await getSearchEngine(this.config);
 
     try {
@@ -319,10 +319,10 @@ module.exports = {
         });
       });
 
-      logger.info(`(SEARCH/MILLISEARCH) Search index rebuilt successfully.`);
+      logger.info(`(SEARCH/MEILISEARCH) Search index rebuilt successfully.`);
     } catch (err) {
       logger.error(
-        `(SEARCH/MILLISEARCH) Error rebuilding search index: ${err}`,
+        `(SEARCH/MEILISEARCH) Error rebuilding search index: ${err}`,
       );
     }
   },
