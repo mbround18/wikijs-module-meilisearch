@@ -53,16 +53,18 @@ jobs:
 
       - name: Create ZIP file
         run: |
-          zip -r millisearch.zip pkg/*
+          cd pkg && zip -r millisearch.zip ./*
 
       - name: Check for VERSION changes
         id: check_version
         run: |
-          git fetch --prune --unshallow
-          if git diff --name-only HEAD^ HEAD | grep -q VERSION; then
-            echo "result=changes" >> $GITHUB_OUTPUT
-          else
+          VERSION=$(cat VERSION)
+          git fetch --prune --tags
+
+          if git show-ref --tags --verify --quiet "refs/tags/v$VERSION"; then
             echo "result=\"no changes\"" >> $GITHUB_OUTPUT
+          else
+            echo "result=changes" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Release Tag and Upload
