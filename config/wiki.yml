@@ -1,0 +1,8 @@
+port: 3000
+bindIP: 0.0.0.0
+db:
+  type: sqlite
+  storage: /wiki/data/db.sqlite
+ssl:
+  enabled: false
+logLevel: debug

@@ -1,0 +1,30 @@
+services:
+  wikijs:
+    image: requarks/wiki:2
+    container_name: wikijs
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_TYPE: sqlite
+    volumes:
+      - ./pkg:/wiki/server/modules/search/millisearch
+      - ./tmp/wikijs:/wiki/data:rw
+      - ./config/wiki.yml:/wiki/config.yml:r
+    depends_on:
+      - millisearch
+    links:
+      - millisearch
+
+  millisearch:
+    image: getmeili/meilisearch:v1.9
+    container_name: millisearch
+    restart: always
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: "demo"
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_LOG_LEVEL: "DEBUG"
+    volumes:
+      - ./tmp/millisearch:/meili_data

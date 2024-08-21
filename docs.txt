@@ -1,0 +1,4701 @@
+ Dagger Python SDK
+Search docs
+Reference
+
+Connection
+Client
+BuildArg
+CacheSharingMode
+CacheVolume
+CacheVolumeID
+Client
+Container
+ContainerID
+CurrentModule
+CurrentModuleID
+DaggerEngine
+DaggerEngineCache
+DaggerEngineCacheEntry
+DaggerEngineCacheEntryID
+DaggerEngineCacheEntrySet
+DaggerEngineCacheEntrySetID
+DaggerEngineCacheID
+DaggerEngineID
+Directory
+DirectoryID
+EnumTypeDef
+EnumTypeDefID
+EnumValueTypeDef
+EnumValueTypeDefID
+EnvVariable
+EnvVariableID
+FieldTypeDef
+FieldTypeDefID
+File
+FileID
+Function
+FunctionArg
+FunctionArgID
+FunctionCall
+FunctionCallArgValue
+FunctionCallArgValueID
+FunctionCallID
+FunctionID
+GeneratedCode
+GeneratedCodeID
+GitModuleSource
+GitModuleSourceID
+GitRef
+GitRefID
+GitRepository
+GitRepositoryID
+Host
+HostID
+ImageLayerCompression
+ImageMediaTypes
+InputTypeDef
+InputTypeDefID
+InterfaceTypeDef
+InterfaceTypeDefID
+JSON
+Label
+LabelID
+ListTypeDef
+ListTypeDefID
+LocalModuleSource
+LocalModuleSourceID
+Module
+ModuleDependency
+ModuleDependencyID
+ModuleID
+ModuleSource
+ModuleSourceID
+ModuleSourceKind
+ModuleSourceView
+ModuleSourceViewID
+NetworkProtocol
+ObjectTypeDef
+ObjectTypeDefID
+PipelineLabel
+Platform
+Port
+PortForward
+PortID
+ScalarTypeDef
+ScalarTypeDefID
+Secret
+SecretID
+Service
+ServiceID
+Socket
+SocketID
+Terminal
+TerminalID
+TypeDef
+TypeDefID
+TypeDefKind
+Void
+Exceptions
+Module
+ ClientView page source
+Client
+Automatically generated client from Dagger API.
+
+classdagger.BuildArg(name: str, value: str)
+Bases: Input
+
+Key value object that represents a build argument.
+
+name: str
+value: str
+classdagger.CacheSharingMode(value, names=<not given>, *values, module=None, qualname=None, type=None, start=1, boundary=None)
+Bases: Enum
+
+Sharing mode of the cache volume.
+
+LOCKED= 'LOCKED'
+PRIVATE= 'PRIVATE'
+SHARED= 'SHARED'
+classdagger.CacheVolume(ctx: Context)
+Bases: Type
+
+A directory whose contents persist across runs.
+
+asyncid()→ CacheVolumeID[source]
+A unique identifier for this CacheVolume.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The CacheVolumeID scalar type represents an identifier for an object of type CacheVolume.
+
+Return type
+:
+CacheVolumeID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.CacheVolumeID
+Bases: Scalar
+
+The CacheVolumeID scalar type represents an identifier for an object of type CacheVolume.
+
+classdagger.Client(ctx: Context | None = None)
+Bases: Root
+
+The root of the DAG.
+
+blob(digest: str, size: int, media_type: str, uncompressed: str)→ Directory[source]
+Retrieves a content-addressed blob.
+
+Parameters
+:
+digest – Digest of the blob
+
+size – Size of the blob
+
+media_type – Media type of the blob
+
+uncompressed – Digest of the uncompressed blob
+
+builtin_container(digest: str)→ Container[source]
+Retrieves a container builtin to the engine.
+
+Parameters
+:
+digest – Digest of the image manifest
+
+cache_volume(key: str)→ CacheVolume[source]
+Constructs a cache volume for a given cache key.
+
+Parameters
+:
+key – A string identifier to target this cache volume (e.g., “modules- cache”).
+
+container(*, platform: Platform | None = None)→ Container[source]
+Creates a scratch container.
+
+Optional platform argument initializes new containers to execute and publish as that platform. Platform defaults to that of the builder’s host.
+
+Parameters
+:
+platform – Platform to initialize the container with.
+
+current_function_call()→ FunctionCall[source]
+The FunctionCall context that the SDK caller is currently executing in.
+
+If the caller is not currently executing in a function, this will return an error.
+
+current_module()→ CurrentModule[source]
+The module currently being served in the session, if any.
+
+asynccurrent_type_defs()→ list[TypeDef][source]
+The TypeDef representations of the objects currently being served in the session.
+
+dagger_engine()→ DaggerEngine[source]
+The Dagger engine container configuration and state
+
+asyncdefault_platform()→ Platform[source]
+The default platform of the engine.
+
+Returns
+:
+The platform config OS and architecture in a Container. The format is [os]/[platform]/[version] (e.g., “darwin/arm64/v7”, “windows/amd64”, “linux/arm64”).
+
+Return type
+:
+Platform
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+directory()→ Directory[source]
+Creates an empty directory.
+
+function(name: str, return_type: TypeDef)→ Function[source]
+Creates a function.
+
+Parameters
+:
+name – Name of the function, in its original format from the implementation language.
+
+return_type – Return type of the function.
+
+generated_code(code: Directory)→ GeneratedCode[source]
+Create a code generation result, given a directory containing the generated code.
+
+git(url: str, *, keep_git_dir: bool | None = False, experimental_service_host: Service | None = None, ssh_known_hosts: str | None = '', ssh_auth_socket: Socket | None = None)→ GitRepository[source]
+Queries a Git repository.
+
+Parameters
+:
+url – URL of the git repository. Can be formatted as https://{host}/{owner}/{repo}, git@{host}:{owner}/{repo}. Suffix “.git” is optional.
+
+keep_git_dir – Set to true to keep .git directory.
+
+experimental_service_host – A service which must be started before the repo is fetched.
+
+ssh_known_hosts – Set SSH known hosts
+
+ssh_auth_socket – Set SSH auth socket
+
+host()→ Host[source]
+Queries the host environment.
+
+http(url: str, *, experimental_service_host: Service | None = None)→ File[source]
+Returns a file containing an http remote url content.
+
+Parameters
+:
+url – HTTP url to get the content from (e.g., “https://docs.dagger.io”).
+
+experimental_service_host – A service which must be started before the URL is fetched.
+
+load_cache_volume_from_id(id: CacheVolumeID)→ CacheVolume[source]
+Load a CacheVolume from its ID.
+
+load_container_from_id(id: ContainerID)→ Container[source]
+Load a Container from its ID.
+
+load_current_module_from_id(id: CurrentModuleID)→ CurrentModule[source]
+Load a CurrentModule from its ID.
+
+load_dagger_engine_cache_entry_from_id(id: DaggerEngineCacheEntryID)→ DaggerEngineCacheEntry[source]
+Load a DaggerEngineCacheEntry from its ID.
+
+load_dagger_engine_cache_entry_set_from_id(id: DaggerEngineCacheEntrySetID)→ DaggerEngineCacheEntrySet[source]
+Load a DaggerEngineCacheEntrySet from its ID.
+
+load_dagger_engine_cache_from_id(id: DaggerEngineCacheID)→ DaggerEngineCache[source]
+Load a DaggerEngineCache from its ID.
+
+load_dagger_engine_from_id(id: DaggerEngineID)→ DaggerEngine[source]
+Load a DaggerEngine from its ID.
+
+load_directory_from_id(id: DirectoryID)→ Directory[source]
+Load a Directory from its ID.
+
+load_enum_type_def_from_id(id: EnumTypeDefID)→ EnumTypeDef[source]
+Load a EnumTypeDef from its ID.
+
+load_enum_value_type_def_from_id(id: EnumValueTypeDefID)→ EnumValueTypeDef[source]
+Load a EnumValueTypeDef from its ID.
+
+load_env_variable_from_id(id: EnvVariableID)→ EnvVariable[source]
+Load a EnvVariable from its ID.
+
+load_field_type_def_from_id(id: FieldTypeDefID)→ FieldTypeDef[source]
+Load a FieldTypeDef from its ID.
+
+load_file_from_id(id: FileID)→ File[source]
+Load a File from its ID.
+
+load_function_arg_from_id(id: FunctionArgID)→ FunctionArg[source]
+Load a FunctionArg from its ID.
+
+load_function_call_arg_value_from_id(id: FunctionCallArgValueID)→ FunctionCallArgValue[source]
+Load a FunctionCallArgValue from its ID.
+
+load_function_call_from_id(id: FunctionCallID)→ FunctionCall[source]
+Load a FunctionCall from its ID.
+
+load_function_from_id(id: FunctionID)→ Function[source]
+Load a Function from its ID.
+
+load_generated_code_from_id(id: GeneratedCodeID)→ GeneratedCode[source]
+Load a GeneratedCode from its ID.
+
+load_git_module_source_from_id(id: GitModuleSourceID)→ GitModuleSource[source]
+Load a GitModuleSource from its ID.
+
+load_git_ref_from_id(id: GitRefID)→ GitRef[source]
+Load a GitRef from its ID.
+
+load_git_repository_from_id(id: GitRepositoryID)→ GitRepository[source]
+Load a GitRepository from its ID.
+
+load_host_from_id(id: HostID)→ Host[source]
+Load a Host from its ID.
+
+load_input_type_def_from_id(id: InputTypeDefID)→ InputTypeDef[source]
+Load a InputTypeDef from its ID.
+
+load_interface_type_def_from_id(id: InterfaceTypeDefID)→ InterfaceTypeDef[source]
+Load a InterfaceTypeDef from its ID.
+
+load_label_from_id(id: LabelID)→ Label[source]
+Load a Label from its ID.
+
+load_list_type_def_from_id(id: ListTypeDefID)→ ListTypeDef[source]
+Load a ListTypeDef from its ID.
+
+load_local_module_source_from_id(id: LocalModuleSourceID)→ LocalModuleSource[source]
+Load a LocalModuleSource from its ID.
+
+load_module_dependency_from_id(id: ModuleDependencyID)→ ModuleDependency[source]
+Load a ModuleDependency from its ID.
+
+load_module_from_id(id: ModuleID)→ Module[source]
+Load a Module from its ID.
+
+load_module_source_from_id(id: ModuleSourceID)→ ModuleSource[source]
+Load a ModuleSource from its ID.
+
+load_module_source_view_from_id(id: ModuleSourceViewID)→ ModuleSourceView[source]
+Load a ModuleSourceView from its ID.
+
+load_object_type_def_from_id(id: ObjectTypeDefID)→ ObjectTypeDef[source]
+Load a ObjectTypeDef from its ID.
+
+load_port_from_id(id: PortID)→ Port[source]
+Load a Port from its ID.
+
+load_scalar_type_def_from_id(id: ScalarTypeDefID)→ ScalarTypeDef[source]
+Load a ScalarTypeDef from its ID.
+
+load_secret_from_id(id: SecretID)→ Secret[source]
+Load a Secret from its ID.
+
+load_service_from_id(id: ServiceID)→ Service[source]
+Load a Service from its ID.
+
+load_socket_from_id(id: SocketID)→ Socket[source]
+Load a Socket from its ID.
+
+load_terminal_from_id(id: TerminalID)→ Terminal[source]
+Load a Terminal from its ID.
+
+load_type_def_from_id(id: TypeDefID)→ TypeDef[source]
+Load a TypeDef from its ID.
+
+module()→ Module[source]
+Create a new module.
+
+module_dependency(source: ModuleSource, *, name: str | None = '')→ ModuleDependency[source]
+Create a new module dependency configuration from a module source and name
+
+Parameters
+:
+source – The source of the dependency
+
+name – If set, the name to use for the dependency. Otherwise, once installed to a parent module, the name of the dependency module will be used by default.
+
+module_source(ref_string: str, *, stable: bool | None = False)→ ModuleSource[source]
+Create a new module source instance from a source ref string.
+
+Parameters
+:
+ref_string – The string ref representation of the module source
+
+stable – If true, enforce that the source is a stable version for source kinds that support versioning.
+
+pipeline(name: str, *, description: str | None = '', labels: list[PipelineLabel] | None = None)→ Client[source]
+Creates a named sub-pipeline.
+
+Deprecated
+
+Explicit pipeline creation is now a no-op
+
+Parameters
+:
+name – Name of the sub-pipeline.
+
+description – Description of the sub-pipeline.
+
+labels – Labels to apply to the sub-pipeline.
+
+secret(name: str, *, accessor: str | None = None)→ Secret[source]
+Reference a secret by name.
+
+set_secret(name: str, plaintext: str)→ Secret[source]
+Sets a secret given a user defined name to its plaintext and returns the secret.
+
+The plaintext value is limited to a size of 128000 bytes.
+
+Parameters
+:
+name – The user defined name for this secret
+
+plaintext – The plaintext of the secret
+
+type_def()→ TypeDef[source]
+Create a new TypeDef.
+
+asyncversion()→ str[source]
+Get the current Dagger Engine version.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+with_(cb: Callable[[Client], Client])→ Client[source]
+Call the provided callable with current Client.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+classdagger.Container(ctx: Context)
+Bases: Type
+
+An OCI-compatible container, also known as a Docker container.
+
+as_service()→ Service[source]
+Turn the container into a Service.
+
+Be sure to set any exposed ports before this conversion.
+
+as_tarball(*, platform_variants: list[Container] | None = None, forced_compression: ImageLayerCompression | None = None, media_types: ImageMediaTypes | None = ImageMediaTypes.OCIMediaTypes)→ File[source]
+Returns a File representing the container serialized to a tarball.
+
+Parameters
+:
+platform_variants – Identifiers for other platform specific containers. Used for multi-platform images.
+
+forced_compression – Force each layer of the image to use the specified compression algorithm. If this is unset, then if a layer already has a compressed blob in the engine’s cache, that will be used (this can result in a mix of compression algorithms for different layers). If this is unset and a layer has no compressed blob in the engine’s cache, then it will be compressed using Gzip.
+
+media_types – Use the specified media types for the image’s layers. Defaults to OCI, which is largely compatible with most recent container runtimes, but Docker may be needed for older runtimes without OCI support.
+
+build(context: Directory, *, dockerfile: str | None = 'Dockerfile', target: str | None = '', build_args: list[BuildArg] | None = None, secrets: list[Secret] | None = None)→ Self[source]
+Initializes this container from a Dockerfile build.
+
+Parameters
+:
+context – Directory context used by the Dockerfile.
+
+dockerfile – Path to the Dockerfile to use.
+
+target – Target build stage to build.
+
+build_args – Additional build arguments.
+
+secrets – Secrets to pass to the build. They will be mounted at /run/secrets/[secret-name] in the build container They can be accessed in the Dockerfile using the “secret” mount type and mount path /run/secrets/[secret-name], e.g. RUN –mount=type=secret,id=my-secret curl [http://example.com?token=$(cat /run/secrets/my- secret)](http://example.com?token=$(cat /run/secrets/my-secret))
+
+asyncdefault_args()→ list[str][source]
+Retrieves default arguments for future commands.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+directory(path: str)→ Directory[source]
+Retrieves a directory at the given path.
+
+Mounts are included.
+
+Parameters
+:
+path – The path of the directory to retrieve (e.g., “./src”).
+
+asyncentrypoint()→ list[str][source]
+Retrieves entrypoint to be prepended to the arguments of all commands.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncenv_variable(name: str)→ str | None[source]
+Retrieves the value of the specified environment variable.
+
+Parameters
+:
+name – The name of the environment variable to retrieve (e.g., “PATH”).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str | None
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncenv_variables()→ list[EnvVariable][source]
+Retrieves the list of environment variables passed to commands.
+
+experimental_with_all_gp_us()→ Self[source]
+EXPERIMENTAL API! Subject to change/removal at any time.
+
+Configures all available GPUs on the host to be accessible to this container.
+
+This currently works for Nvidia devices only.
+
+experimental_with_gpu(devices: list[str])→ Self[source]
+EXPERIMENTAL API! Subject to change/removal at any time.
+
+Configures the provided list of devices to be accessible to this container.
+
+This currently works for Nvidia devices only.
+
+Parameters
+:
+devices – List of devices to be accessible to this container.
+
+asyncexport(path: str, *, platform_variants: list[Container] | None = None, forced_compression: ImageLayerCompression | None = None, media_types: ImageMediaTypes | None = ImageMediaTypes.OCIMediaTypes)→ str[source]
+Writes the container as an OCI tarball to the destination file path on the host.
+
+It can also export platform variants.
+
+Parameters
+:
+path – Host’s destination path (e.g., “./tarball”). Path can be relative to the engine’s workdir or absolute.
+
+platform_variants – Identifiers for other platform specific containers. Used for multi-platform image.
+
+forced_compression – Force each layer of the exported image to use the specified compression algorithm. If this is unset, then if a layer already has a compressed blob in the engine’s cache, that will be used (this can result in a mix of compression algorithms for different layers). If this is unset and a layer has no compressed blob in the engine’s cache, then it will be compressed using Gzip.
+
+media_types – Use the specified media types for the exported image’s layers. Defaults to OCI, which is largely compatible with most recent container runtimes, but Docker may be needed for older runtimes without OCI support.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncexposed_ports()→ list[Port][source]
+Retrieves the list of exposed ports.
+
+This includes ports already exposed by the image, even if not explicitly added with dagger.
+
+file(path: str)→ File[source]
+Retrieves a file at the given path.
+
+Mounts are included.
+
+Parameters
+:
+path – The path of the file to retrieve (e.g., “./README.md”).
+
+from_(address: str)→ Self[source]
+Initializes this container from a pulled base image.
+
+Parameters
+:
+address – Image’s address from its registry. Formatted as [host]/[user]/[repo]:[tag] (e.g., “docker.io/dagger/dagger:main”).
+
+asyncid()→ ContainerID[source]
+A unique identifier for this Container.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ContainerID scalar type represents an identifier for an object of type Container.
+
+Return type
+:
+ContainerID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncimage_ref()→ str[source]
+The unique image reference which can only be retrieved immediately after the ‘Container.From’ call.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+import_(source: File, *, tag: str | None = '')→ Self[source]
+Reads the container from an OCI tarball.
+
+Parameters
+:
+source – File to read the container from.
+
+tag – Identifies the tag to import from the archive, if the archive bundles multiple tags.
+
+asynclabel(name: str)→ str | None[source]
+Retrieves the value of the specified label.
+
+Parameters
+:
+name – The name of the label (e.g., “org.opencontainers.artifact.created”).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str | None
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asynclabels()→ list[Label][source]
+Retrieves the list of labels passed to container.
+
+asyncmounts()→ list[str][source]
+Retrieves the list of paths where a directory is mounted.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+pipeline(name: str, *, description: str | None = '', labels: list[PipelineLabel] | None = None)→ Self[source]
+Creates a named sub-pipeline.
+
+Deprecated
+
+Explicit pipeline creation is now a no-op
+
+Parameters
+:
+name – Name of the sub-pipeline.
+
+description – Description of the sub-pipeline.
+
+labels – Labels to apply to the sub-pipeline.
+
+asyncplatform()→ Platform[source]
+The platform this container executes and publishes as.
+
+Returns
+:
+The platform config OS and architecture in a Container. The format is [os]/[platform]/[version] (e.g., “darwin/arm64/v7”, “windows/amd64”, “linux/arm64”).
+
+Return type
+:
+Platform
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncpublish(address: str, *, platform_variants: list[Container] | None = None, forced_compression: ImageLayerCompression | None = None, media_types: ImageMediaTypes | None = ImageMediaTypes.OCIMediaTypes)→ str[source]
+Publishes this container as a new image to the specified address.
+
+Publish returns a fully qualified ref.
+
+It can also publish platform variants.
+
+Parameters
+:
+address – Registry’s address to publish the image to. Formatted as [host]/[user]/[repo]:[tag] (e.g. “docker.io/dagger/dagger:main”).
+
+platform_variants – Identifiers for other platform specific containers. Used for multi-platform image.
+
+forced_compression – Force each layer of the published image to use the specified compression algorithm. If this is unset, then if a layer already has a compressed blob in the engine’s cache, that will be used (this can result in a mix of compression algorithms for different layers). If this is unset and a layer has no compressed blob in the engine’s cache, then it will be compressed using Gzip.
+
+media_types – Use the specified media types for the published image’s layers. Defaults to OCI, which is largely compatible with most recent registries, but Docker may be needed for older registries without OCI support.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+rootfs()→ Directory[source]
+Retrieves this container’s root filesystem. Mounts are not included.
+
+asyncstderr()→ str[source]
+The error stream of the last executed command.
+
+Will execute default command if none is set, or error if there’s no default.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncstdout()→ str[source]
+The output stream of the last executed command.
+
+Will execute default command if none is set, or error if there’s no default.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsync()→ Self[source]
+Forces evaluation of the pipeline in the engine.
+
+It doesn’t run the default command if no exec has been set.
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+terminal(*, cmd: list[str] | None = None, experimental_privileged_nesting: bool | None = False, insecure_root_capabilities: bool | None = False)→ Self[source]
+Opens an interactive terminal for this container using its configured default terminal command if not overridden by args (or sh as a fallback default).
+
+Parameters
+:
+cmd – If set, override the container’s default terminal command and invoke these command arguments instead.
+
+experimental_privileged_nesting – Provides Dagger access to the executed command. Do not use this option unless you trust the command being executed; the command being executed WILL BE GRANTED FULL ACCESS TO YOUR HOST FILESYSTEM.
+
+insecure_root_capabilities – Execute the command with all root capabilities. This is similar to running a command with “sudo” or executing “docker run” with the ” –privileged” flag. Containerization does not provide any security guarantees when using this option. It should only be used when absolutely necessary and only with trusted commands.
+
+asyncuser()→ str[source]
+Retrieves the user to be set for all commands.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+with_(cb: Callable[[Container], Container])→ Container[source]
+Call the provided callable with current Container.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_default_args(args: list[str])→ Self[source]
+Configures default arguments for future commands.
+
+Parameters
+:
+args – Arguments to prepend to future executions (e.g., [“-v”, “–no- cache”]).
+
+with_default_terminal_cmd(args: list[str], *, experimental_privileged_nesting: bool | None = False, insecure_root_capabilities: bool | None = False)→ Self[source]
+Set the default command to invoke for the container’s terminal API.
+
+Parameters
+:
+args – The args of the command.
+
+experimental_privileged_nesting – Provides Dagger access to the executed command. Do not use this option unless you trust the command being executed; the command being executed WILL BE GRANTED FULL ACCESS TO YOUR HOST FILESYSTEM.
+
+insecure_root_capabilities – Execute the command with all root capabilities. This is similar to running a command with “sudo” or executing “docker run” with the ” –privileged” flag. Containerization does not provide any security guarantees when using this option. It should only be used when absolutely necessary and only with trusted commands.
+
+with_directory(path: str, directory: Directory, *, exclude: list[str] | None = None, include: list[str] | None = None, owner: str | None = '')→ Self[source]
+Retrieves this container plus a directory written at the given path.
+
+Parameters
+:
+path – Location of the written directory (e.g., “/tmp/directory”).
+
+directory – Identifier of the directory to write
+
+exclude – Patterns to exclude in the written directory (e.g. [“node_modules/**”, “.gitignore”, “.git/”]).
+
+include – Patterns to include in the written directory (e.g. [”*.go”, “go.mod”, “go.sum”]).
+
+owner – A user:group to set for the directory and its contents. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+with_entrypoint(args: list[str], *, keep_default_args: bool | None = False)→ Self[source]
+Retrieves this container but with a different command entrypoint.
+
+Parameters
+:
+args – Entrypoint to use for future executions (e.g., [“go”, “run”]).
+
+keep_default_args – Don’t remove the default arguments when setting the entrypoint.
+
+with_env_variable(name: str, value: str, *, expand: bool | None = False)→ Self[source]
+Retrieves this container plus the given environment variable.
+
+Parameters
+:
+name – The name of the environment variable (e.g., “HOST”).
+
+value – The value of the environment variable. (e.g., “localhost”).
+
+expand – Replace ${VAR} or $VAR in the value according to the current environment variables defined in the container (e.g., “/opt/bin:$PATH”).
+
+with_exec(args: list[str], *, skip_entrypoint: bool | None = True, use_entrypoint: bool | None = False, stdin: str | None = '', redirect_stdout: str | None = '', redirect_stderr: str | None = '', experimental_privileged_nesting: bool | None = False, insecure_root_capabilities: bool | None = False)→ Self[source]
+Retrieves this container after executing the specified command inside it.
+
+Parameters
+:
+args – Command to run instead of the container’s default command (e.g., [“run”, “main.go”]). If empty, the container’s default command is used.
+
+skip_entrypoint – DEPRECATED: For true this can be removed. For false, use useEntrypoint instead.
+
+use_entrypoint – If the container has an entrypoint, prepend it to the args.
+
+stdin – Content to write to the command’s standard input before closing (e.g., “Hello world”).
+
+redirect_stdout – Redirect the command’s standard output to a file in the container (e.g., “/tmp/stdout”).
+
+redirect_stderr – Redirect the command’s standard error to a file in the container (e.g., “/tmp/stderr”).
+
+experimental_privileged_nesting – Provides Dagger access to the executed command. Do not use this option unless you trust the command being executed; the command being executed WILL BE GRANTED FULL ACCESS TO YOUR HOST FILESYSTEM.
+
+insecure_root_capabilities – Execute the command with all root capabilities. This is similar to running a command with “sudo” or executing “docker run” with the ” –privileged” flag. Containerization does not provide any security guarantees when using this option. It should only be used when absolutely necessary and only with trusted commands.
+
+with_exposed_port(port: int, *, protocol: NetworkProtocol | None = NetworkProtocol.TCP, description: str | None = None, experimental_skip_healthcheck: bool | None = False)→ Self[source]
+Expose a network port.
+
+Exposed ports serve two purposes:
+
+For health checks and introspection, when running services
+
+For setting the EXPOSE OCI field when publishing the container
+
+Parameters
+:
+port – Port number to expose
+
+protocol – Transport layer network protocol
+
+description – Optional port description
+
+experimental_skip_healthcheck – Skip the health check when run as a service.
+
+with_file(path: str, source: File, *, permissions: int | None = None, owner: str | None = '')→ Self[source]
+Retrieves this container plus the contents of the given file copied to the given path.
+
+Parameters
+:
+path – Location of the copied file (e.g., “/tmp/file.txt”).
+
+source – Identifier of the file to copy.
+
+permissions – Permission given to the copied file (e.g., 0600).
+
+owner – A user:group to set for the file. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+with_files(path: str, sources: list[File], *, permissions: int | None = None, owner: str | None = '')→ Self[source]
+Retrieves this container plus the contents of the given files copied to the given path.
+
+Parameters
+:
+path – Location where copied files should be placed (e.g., “/src”).
+
+sources – Identifiers of the files to copy.
+
+permissions – Permission given to the copied files (e.g., 0600).
+
+owner – A user:group to set for the files. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+with_focus()→ Self[source]
+Indicate that subsequent operations should be featured more prominently in the UI.
+
+with_label(name: str, value: str)→ Self[source]
+Retrieves this container plus the given label.
+
+Parameters
+:
+name – The name of the label (e.g., “org.opencontainers.artifact.created”).
+
+value – The value of the label (e.g., “2023-01-01T00:00:00Z”).
+
+with_mounted_cache(path: str, cache: CacheVolume, *, source: Directory | None = None, sharing: CacheSharingMode | None = CacheSharingMode.SHARED, owner: str | None = '')→ Self[source]
+Retrieves this container plus a cache volume mounted at the given path.
+
+Parameters
+:
+path – Location of the cache directory (e.g., “/cache/node_modules”).
+
+cache – Identifier of the cache volume to mount.
+
+source – Identifier of the directory to use as the cache volume’s root.
+
+sharing – Sharing mode of the cache volume.
+
+owner – A user:group to set for the mounted cache directory. Note that this changes the ownership of the specified mount along with the initial filesystem provided by source (if any). It does not have any effect if/when the cache has already been created. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+with_mounted_directory(path: str, source: Directory, *, owner: str | None = '')→ Self[source]
+Retrieves this container plus a directory mounted at the given path.
+
+Parameters
+:
+path – Location of the mounted directory (e.g., “/mnt/directory”).
+
+source – Identifier of the mounted directory.
+
+owner – A user:group to set for the mounted directory and its contents. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+with_mounted_file(path: str, source: File, *, owner: str | None = '')→ Self[source]
+Retrieves this container plus a file mounted at the given path.
+
+Parameters
+:
+path – Location of the mounted file (e.g., “/tmp/file.txt”).
+
+source – Identifier of the mounted file.
+
+owner – A user or user:group to set for the mounted file. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+with_mounted_secret(path: str, source: Secret, *, owner: str | None = '', mode: int | None = 256)→ Self[source]
+Retrieves this container plus a secret mounted into a file at the given path.
+
+Parameters
+:
+path – Location of the secret file (e.g., “/tmp/secret.txt”).
+
+source – Identifier of the secret to mount.
+
+owner – A user:group to set for the mounted secret. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+mode – Permission given to the mounted secret (e.g., 0600). This option requires an owner to be set to be active.
+
+with_mounted_temp(path: str)→ Self[source]
+Retrieves this container plus a temporary directory mounted at the given path. Any writes will be ephemeral to a single withExec call; they will not be persisted to subsequent withExecs.
+
+Parameters
+:
+path – Location of the temporary directory (e.g., “/tmp/temp_dir”).
+
+with_new_file(path: str, contents: str, *, permissions: int | None = 420, owner: str | None = '')→ Self[source]
+Retrieves this container plus a new file written at the given path.
+
+Parameters
+:
+path – Location of the written file (e.g., “/tmp/file.txt”).
+
+contents – Content of the file to write (e.g., “Hello world!”).
+
+permissions – Permission given to the written file (e.g., 0600).
+
+owner – A user:group to set for the file. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+with_registry_auth(address: str, username: str, secret: Secret)→ Self[source]
+Retrieves this container with a registry authentication for a given address.
+
+Parameters
+:
+address – Registry’s address to bind the authentication to. Formatted as [host]/[user]/[repo]:[tag] (e.g. docker.io/dagger/dagger:main).
+
+username – The username of the registry’s account (e.g., “Dagger”).
+
+secret – The API key, password or token to authenticate to this registry.
+
+with_rootfs(directory: Directory)→ Self[source]
+Retrieves the container with the given directory mounted to /.
+
+Parameters
+:
+directory – Directory to mount.
+
+with_secret_variable(name: str, secret: Secret)→ Self[source]
+Retrieves this container plus an env variable containing the given secret.
+
+Parameters
+:
+name – The name of the secret variable (e.g., “API_SECRET”).
+
+secret – The identifier of the secret value.
+
+with_service_binding(alias: str, service: Service)→ Self[source]
+Establish a runtime dependency on a service.
+
+The service will be started automatically when needed and detached when it is no longer needed, executing the default command if none is set.
+
+The service will be reachable from the container via the provided hostname alias.
+
+The service dependency will also convey to any files or directories produced by the container.
+
+Parameters
+:
+alias – A name that can be used to reach the service from the container
+
+service – Identifier of the service container
+
+with_unix_socket(path: str, source: Socket, *, owner: str | None = '')→ Self[source]
+Retrieves this container plus a socket forwarded to the given Unix socket path.
+
+Parameters
+:
+path – Location of the forwarded Unix socket (e.g., “/tmp/socket”).
+
+source – Identifier of the socket to forward.
+
+owner – A user:group to set for the mounted socket. The user and group can either be an ID (1000:1000) or a name (foo:bar). If the group is omitted, it defaults to the same as the user.
+
+with_user(name: str)→ Self[source]
+Retrieves this container with a different command user.
+
+Parameters
+:
+name – The user to set (e.g., “root”).
+
+with_workdir(path: str)→ Self[source]
+Retrieves this container with a different working directory.
+
+Parameters
+:
+path – The path to set as the working directory (e.g., “/app”).
+
+without_default_args()→ Self[source]
+Retrieves this container with unset default arguments for future commands.
+
+without_directory(path: str)→ Self[source]
+Retrieves this container with the directory at the given path removed.
+
+Parameters
+:
+path – Location of the directory to remove (e.g., “.github/”).
+
+without_entrypoint(*, keep_default_args: bool | None = False)→ Self[source]
+Retrieves this container with an unset command entrypoint.
+
+Parameters
+:
+keep_default_args – Don’t remove the default arguments when unsetting the entrypoint.
+
+without_env_variable(name: str)→ Self[source]
+Retrieves this container minus the given environment variable.
+
+Parameters
+:
+name – The name of the environment variable (e.g., “HOST”).
+
+without_exposed_port(port: int, *, protocol: NetworkProtocol | None = NetworkProtocol.TCP)→ Self[source]
+Unexpose a previously exposed port.
+
+Parameters
+:
+port – Port number to unexpose
+
+protocol – Port protocol to unexpose
+
+without_file(path: str)→ Self[source]
+Retrieves this container with the file at the given path removed.
+
+Parameters
+:
+path – Location of the file to remove (e.g., “/file.txt”).
+
+without_focus()→ Self[source]
+Indicate that subsequent operations should not be featured more prominently in the UI.
+
+This is the initial state of all containers.
+
+without_label(name: str)→ Self[source]
+Retrieves this container minus the given environment label.
+
+Parameters
+:
+name – The name of the label to remove (e.g., “org.opencontainers.artifact.created”).
+
+without_mount(path: str)→ Self[source]
+Retrieves this container after unmounting everything at the given path.
+
+Parameters
+:
+path – Location of the cache directory (e.g., “/cache/node_modules”).
+
+without_registry_auth(address: str)→ Self[source]
+Retrieves this container without the registry authentication of a given address.
+
+Parameters
+:
+address – Registry’s address to remove the authentication from. Formatted as [host]/[user]/[repo]:[tag] (e.g. docker.io/dagger/dagger:main).
+
+without_secret_variable(name: str)→ Self[source]
+Retrieves this container minus the given environment variable containing the secret.
+
+Parameters
+:
+name – The name of the environment variable (e.g., “HOST”).
+
+without_unix_socket(path: str)→ Self[source]
+Retrieves this container with a previously added Unix socket removed.
+
+Parameters
+:
+path – Location of the socket to remove (e.g., “/tmp/socket”).
+
+without_user()→ Self[source]
+Retrieves this container with an unset command user.
+
+Should default to root.
+
+without_workdir()→ Self[source]
+Retrieves this container with an unset working directory.
+
+Should default to “/”.
+
+asyncworkdir()→ str[source]
+Retrieves the working directory for all commands.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.ContainerID
+Bases: Scalar
+
+The ContainerID scalar type represents an identifier for an object of type Container.
+
+classdagger.CurrentModule(ctx: Context)
+Bases: Type
+
+Reflective module API provided to functions at runtime.
+
+asyncid()→ CurrentModuleID[source]
+A unique identifier for this CurrentModule.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The CurrentModuleID scalar type represents an identifier for an object of type CurrentModule.
+
+Return type
+:
+CurrentModuleID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the module being executed in
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+source()→ Directory[source]
+The directory containing the module’s source code loaded into the engine (plus any generated code that may have been created).
+
+workdir(path: str, *, exclude: list[str] | None = None, include: list[str] | None = None)→ Directory[source]
+Load a directory from the module’s scratch working directory, including any changes that may have been made to it during module function execution.
+
+Parameters
+:
+path – Location of the directory to access (e.g., “.”).
+
+exclude – Exclude artifacts that match the given pattern (e.g., [“node_modules/”, “.git*”]).
+
+include – Include only artifacts that match the given pattern (e.g., [“app/”, “package.*”]).
+
+workdir_file(path: str)→ File[source]
+Load a file from the module’s scratch working directory, including any changes that may have been made to it during module function execution.Load a file from the module’s scratch working directory, including any changes that may have been made to it during module function execution.
+
+Parameters
+:
+path – Location of the file to retrieve (e.g., “README.md”).
+
+classdagger.CurrentModuleID
+Bases: Scalar
+
+The CurrentModuleID scalar type represents an identifier for an object of type CurrentModule.
+
+classdagger.DaggerEngine(ctx: Context)
+Bases: Type
+
+The Dagger engine configuration and state
+
+asyncid()→ DaggerEngineID[source]
+A unique identifier for this DaggerEngine.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The DaggerEngineID scalar type represents an identifier for an object of type DaggerEngine.
+
+Return type
+:
+DaggerEngineID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+local_cache()→ DaggerEngineCache[source]
+The local (on-disk) cache for the Dagger engine
+
+classdagger.DaggerEngineCache(ctx: Context)
+Bases: Type
+
+A cache storage for the Dagger engine
+
+entry_set()→ DaggerEngineCacheEntrySet[source]
+The current set of entries in the cache
+
+asyncid()→ DaggerEngineCacheID[source]
+A unique identifier for this DaggerEngineCache.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The DaggerEngineCacheID scalar type represents an identifier for an object of type DaggerEngineCache.
+
+Return type
+:
+DaggerEngineCacheID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asynckeep_bytes()→ int[source]
+The maximum bytes to keep in the cache without pruning, after which automatic pruning may kick in.
+
+Returns
+:
+The Int scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+Return type
+:
+int
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncprune()→ Void | None[source]
+Prune the cache of releaseable entries
+
+Returns
+:
+The absence of a value. A Null Void is used as a placeholder for resolvers that do not return anything.
+
+Return type
+:
+Void | None
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.DaggerEngineCacheEntry(ctx: Context)
+Bases: Type
+
+An individual cache entry in a cache entry set
+
+asyncactively_used()→ bool[source]
+Whether the cache entry is actively being used.
+
+Returns
+:
+The Boolean scalar type represents true or false.
+
+Return type
+:
+bool
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asynccreated_time_unix_nano()→ int[source]
+The time the cache entry was created, in Unix nanoseconds.
+
+Returns
+:
+The Int scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+Return type
+:
+int
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncdescription()→ str[source]
+The description of the cache entry.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncdisk_space_bytes()→ int[source]
+The disk space used by the cache entry.
+
+Returns
+:
+The Int scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+Return type
+:
+int
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ DaggerEngineCacheEntryID[source]
+A unique identifier for this DaggerEngineCacheEntry.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The DaggerEngineCacheEntryID scalar type represents an identifier for an object of type DaggerEngineCacheEntry.
+
+Return type
+:
+DaggerEngineCacheEntryID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncmost_recent_use_time_unix_nano()→ int[source]
+The most recent time the cache entry was used, in Unix nanoseconds.
+
+Returns
+:
+The Int scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+Return type
+:
+int
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.DaggerEngineCacheEntryID
+Bases: Scalar
+
+The DaggerEngineCacheEntryID scalar type represents an identifier for an object of type DaggerEngineCacheEntry.
+
+classdagger.DaggerEngineCacheEntrySet(ctx: Context)
+Bases: Type
+
+A set of cache entries returned by a query to a cache
+
+asyncdisk_space_bytes()→ int[source]
+The total disk space used by the cache entries in this set.
+
+Returns
+:
+The Int scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+Return type
+:
+int
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncentries()→ list[DaggerEngineCacheEntry][source]
+The list of individual cache entries in the set
+
+asyncentry_count()→ int[source]
+The number of cache entries in this set.
+
+Returns
+:
+The Int scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+Return type
+:
+int
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ DaggerEngineCacheEntrySetID[source]
+A unique identifier for this DaggerEngineCacheEntrySet.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The DaggerEngineCacheEntrySetID scalar type represents an identifier for an object of type DaggerEngineCacheEntrySet.
+
+Return type
+:
+DaggerEngineCacheEntrySetID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.DaggerEngineCacheEntrySetID
+Bases: Scalar
+
+The DaggerEngineCacheEntrySetID scalar type represents an identifier for an object of type DaggerEngineCacheEntrySet.
+
+classdagger.DaggerEngineCacheID
+Bases: Scalar
+
+The DaggerEngineCacheID scalar type represents an identifier for an object of type DaggerEngineCache.
+
+classdagger.DaggerEngineID
+Bases: Scalar
+
+The DaggerEngineID scalar type represents an identifier for an object of type DaggerEngine.
+
+classdagger.Directory(ctx: Context)
+Bases: Type
+
+A directory.
+
+as_module(*, source_root_path: str | None = '.', engine_version: str | None = None)→ Module[source]
+Load the directory as a Dagger module
+
+Parameters
+:
+source_root_path – An optional subpath of the directory which contains the module’s configuration file. This is needed when the module code is in a subdirectory but requires parent directories to be loaded in order to execute. For example, the module source code may need a go.mod, project.toml, package.json, etc. file from a parent directory. If not set, the module source code is loaded from the root of the directory.
+
+engine_version – The engine version to upgrade to.
+
+diff(other: Self)→ Self[source]
+Gets the difference between this directory and an another directory.
+
+Parameters
+:
+other – Identifier of the directory to compare.
+
+directory(path: str)→ Self[source]
+Retrieves a directory at the given path.
+
+Parameters
+:
+path – Location of the directory to retrieve (e.g., “/src”).
+
+docker_build(*, platform: Platform | None = None, dockerfile: str | None = 'Dockerfile', target: str | None = '', build_args: list[BuildArg] | None = None, secrets: list[Secret] | None = None)→ Container[source]
+Builds a new Docker container from this directory.
+
+Parameters
+:
+platform – The platform to build.
+
+dockerfile – Path to the Dockerfile to use (e.g., “frontend.Dockerfile”).
+
+target – Target build stage to build.
+
+build_args – Build arguments to use in the build.
+
+secrets – Secrets to pass to the build. They will be mounted at /run/secrets/[secret-name].
+
+asyncentries(*, path: str | None = None)→ list[str][source]
+Returns a list of files and directories at the given path.
+
+Parameters
+:
+path – Location of the directory to look at (e.g., “/src”).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncexport(path: str, *, wipe: bool | None = False)→ str[source]
+Writes the contents of the directory to a path on the host.
+
+Parameters
+:
+path – Location of the copied directory (e.g., “logs/”).
+
+wipe – If true, then the host directory will be wiped clean before exporting so that it exactly matches the directory being exported; this means it will delete any files on the host that aren’t in the exported dir. If false (the default), the contents of the directory will be merged with any existing contents of the host directory, leaving any existing files on the host that aren’t in the exported directory alone.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+file(path: str)→ File[source]
+Retrieves a file at the given path.
+
+Parameters
+:
+path – Location of the file to retrieve (e.g., “README.md”).
+
+asyncglob(pattern: str)→ list[str][source]
+Returns a list of files and directories that matche the given pattern.
+
+Parameters
+:
+pattern – Pattern to match (e.g., “*.md”).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ DirectoryID[source]
+A unique identifier for this Directory.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The DirectoryID scalar type represents an identifier for an object of type Directory.
+
+Return type
+:
+DirectoryID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+pipeline(name: str, *, description: str | None = '', labels: list[PipelineLabel] | None = None)→ Self[source]
+Creates a named sub-pipeline.
+
+Deprecated
+
+Explicit pipeline creation is now a no-op
+
+Parameters
+:
+name – Name of the sub-pipeline.
+
+description – Description of the sub-pipeline.
+
+labels – Labels to apply to the sub-pipeline.
+
+asyncsync()→ Self[source]
+Force evaluation in the engine.
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+terminal(*, cmd: list[str] | None = None, experimental_privileged_nesting: bool | None = False, insecure_root_capabilities: bool | None = False, container: Container | None = None)→ Self[source]
+Opens an interactive terminal in new container with this directory mounted inside.
+
+Parameters
+:
+cmd – If set, override the container’s default terminal command and invoke these command arguments instead.
+
+experimental_privileged_nesting – Provides Dagger access to the executed command. Do not use this option unless you trust the command being executed; the command being executed WILL BE GRANTED FULL ACCESS TO YOUR HOST FILESYSTEM.
+
+insecure_root_capabilities – Execute the command with all root capabilities. This is similar to running a command with “sudo” or executing “docker run” with the ” –privileged” flag. Containerization does not provide any security guarantees when using this option. It should only be used when absolutely necessary and only with trusted commands.
+
+container – If set, override the default container used for the terminal.
+
+with_(cb: Callable[[Directory], Directory])→ Directory[source]
+Call the provided callable with current Directory.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_directory(path: str, directory: Self, *, exclude: list[str] | None = None, include: list[str] | None = None)→ Self[source]
+Retrieves this directory plus a directory written at the given path.
+
+Parameters
+:
+path – Location of the written directory (e.g., “/src/”).
+
+directory – Identifier of the directory to copy.
+
+exclude – Exclude artifacts that match the given pattern (e.g., [“node_modules/”, “.git*”]).
+
+include – Include only artifacts that match the given pattern (e.g., [“app/”, “package.*”]).
+
+with_file(path: str, source: File, *, permissions: int | None = None)→ Self[source]
+Retrieves this directory plus the contents of the given file copied to the given path.
+
+Parameters
+:
+path – Location of the copied file (e.g., “/file.txt”).
+
+source – Identifier of the file to copy.
+
+permissions – Permission given to the copied file (e.g., 0600).
+
+with_files(path: str, sources: list[File], *, permissions: int | None = None)→ Self[source]
+Retrieves this directory plus the contents of the given files copied to the given path.
+
+Parameters
+:
+path – Location where copied files should be placed (e.g., “/src”).
+
+sources – Identifiers of the files to copy.
+
+permissions – Permission given to the copied files (e.g., 0600).
+
+with_new_directory(path: str, *, permissions: int | None = 420)→ Self[source]
+Retrieves this directory plus a new directory created at the given path.
+
+Parameters
+:
+path – Location of the directory created (e.g., “/logs”).
+
+permissions – Permission granted to the created directory (e.g., 0777).
+
+with_new_file(path: str, contents: str, *, permissions: int | None = 420)→ Self[source]
+Retrieves this directory plus a new file written at the given path.
+
+Parameters
+:
+path – Location of the written file (e.g., “/file.txt”).
+
+contents – Content of the written file (e.g., “Hello world!”).
+
+permissions – Permission given to the copied file (e.g., 0600).
+
+with_timestamps(timestamp: int)→ Self[source]
+Retrieves this directory with all file/dir timestamps set to the given time.
+
+Parameters
+:
+timestamp – Timestamp to set dir/files in. Formatted in seconds following Unix epoch (e.g., 1672531199).
+
+without_directory(path: str)→ Self[source]
+Retrieves this directory with the directory at the given path removed.
+
+Parameters
+:
+path – Location of the directory to remove (e.g., “.github/”).
+
+without_file(path: str)→ Self[source]
+Retrieves this directory with the file at the given path removed.
+
+Parameters
+:
+path – Location of the file to remove (e.g., “/file.txt”).
+
+classdagger.DirectoryID
+Bases: Scalar
+
+The DirectoryID scalar type represents an identifier for an object of type Directory.
+
+classdagger.EnumTypeDef(ctx: Context)
+Bases: Type
+
+A definition of a custom enum defined in a Module.
+
+asyncdescription()→ str[source]
+A doc string for the enum, if any.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ EnumTypeDefID[source]
+A unique identifier for this EnumTypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The EnumTypeDefID scalar type represents an identifier for an object of type EnumTypeDef.
+
+Return type
+:
+EnumTypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the enum.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsource_module_name()→ str[source]
+If this EnumTypeDef is associated with a Module, the name of the module. Unset otherwise.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncvalues()→ list[EnumValueTypeDef][source]
+The values of the enum.
+
+classdagger.EnumTypeDefID
+Bases: Scalar
+
+The EnumTypeDefID scalar type represents an identifier for an object of type EnumTypeDef.
+
+classdagger.EnumValueTypeDef(ctx: Context)
+Bases: Type
+
+A definition of a value in a custom enum defined in a Module.
+
+asyncdescription()→ str[source]
+A doc string for the enum value, if any.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ EnumValueTypeDefID[source]
+A unique identifier for this EnumValueTypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The EnumValueTypeDefID scalar type represents an identifier for an object of type EnumValueTypeDef.
+
+Return type
+:
+EnumValueTypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the enum value.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.EnumValueTypeDefID
+Bases: Scalar
+
+The EnumValueTypeDefID scalar type represents an identifier for an object of type EnumValueTypeDef.
+
+classdagger.EnvVariable(ctx: Context)
+Bases: Type
+
+An environment variable name and value.
+
+asyncid()→ EnvVariableID[source]
+A unique identifier for this EnvVariable.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The EnvVariableID scalar type represents an identifier for an object of type EnvVariable.
+
+Return type
+:
+EnvVariableID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The environment variable name.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncvalue()→ str[source]
+The environment variable value.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.EnvVariableID
+Bases: Scalar
+
+The EnvVariableID scalar type represents an identifier for an object of type EnvVariable.
+
+classdagger.FieldTypeDef(ctx: Context)
+Bases: Type
+
+A definition of a field on a custom object defined in a Module. A field on an object has a static value, as opposed to a function on an object whose value is computed by invoking code (and can accept arguments).
+
+asyncdescription()→ str[source]
+A doc string for the field, if any.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ FieldTypeDefID[source]
+A unique identifier for this FieldTypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The FieldTypeDefID scalar type represents an identifier for an object of type FieldTypeDef.
+
+Return type
+:
+FieldTypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the field in lowerCamelCase format.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+type_def()→ TypeDef[source]
+The type of the field.
+
+classdagger.FieldTypeDefID
+Bases: Scalar
+
+The FieldTypeDefID scalar type represents an identifier for an object of type FieldTypeDef.
+
+classdagger.File(ctx: Context)
+Bases: Type
+
+A file.
+
+asynccontents()→ str[source]
+Retrieves the contents of the file.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncdigest(*, exclude_metadata: bool | None = False)→ str[source]
+Return the file’s digest. The format of the digest is not guaranteed to be stable between releases of Dagger. It is guaranteed to be stable between invocations of the same Dagger engine.
+
+Parameters
+:
+exclude_metadata – If true, exclude metadata from the digest.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncexport(path: str, *, allow_parent_dir_path: bool | None = False)→ str[source]
+Writes the file to a file path on the host.
+
+Parameters
+:
+path – Location of the written directory (e.g., “output.txt”).
+
+allow_parent_dir_path – If allowParentDirPath is true, the path argument can be a directory path, in which case the file will be created in that directory.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ FileID[source]
+A unique identifier for this File.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The FileID scalar type represents an identifier for an object of type File.
+
+Return type
+:
+FileID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+Retrieves the name of the file.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsize()→ int[source]
+Retrieves the size of the file, in bytes.
+
+Returns
+:
+The Int scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+Return type
+:
+int
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsync()→ Self[source]
+Force evaluation in the engine.
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+with_(cb: Callable[[File], File])→ File[source]
+Call the provided callable with current File.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_name(name: str)→ Self[source]
+Retrieves this file with its name set to the given name.
+
+Parameters
+:
+name – Name to set file to.
+
+with_timestamps(timestamp: int)→ Self[source]
+Retrieves this file with its created/modified timestamps set to the given time.
+
+Parameters
+:
+timestamp – Timestamp to set dir/files in. Formatted in seconds following Unix epoch (e.g., 1672531199).
+
+classdagger.FileID
+Bases: Scalar
+
+The FileID scalar type represents an identifier for an object of type File.
+
+classdagger.Function(ctx: Context)
+Bases: Type
+
+Function represents a resolver provided by a Module. A function always evaluates against a parent object and is given a set of named arguments.
+
+asyncargs()→ list[FunctionArg][source]
+Arguments accepted by the function, if any.
+
+asyncdescription()→ str[source]
+A doc string for the function, if any.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ FunctionID[source]
+A unique identifier for this Function.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The FunctionID scalar type represents an identifier for an object of type Function.
+
+Return type
+:
+FunctionID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the function.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+return_type()→ TypeDef[source]
+The type returned by the function.
+
+with_(cb: Callable[[Function], Function])→ Function[source]
+Call the provided callable with current Function.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_arg(name: str, type_def: TypeDef, *, description: str | None = '', default_value: JSON | None = None)→ Self[source]
+Returns the function with the provided argument
+
+Parameters
+:
+name – The name of the argument
+
+type_def – The type of the argument
+
+description – A doc string for the argument, if any
+
+default_value – A default value to use for this argument if not explicitly set by the caller, if any
+
+with_description(description: str)→ Self[source]
+Returns the function with the given doc string.
+
+Parameters
+:
+description – The doc string to set.
+
+classdagger.FunctionArg(ctx: Context)
+Bases: Type
+
+An argument accepted by a function. This is a specification for an argument at function definition time, not an argument passed at function call time.
+
+asyncdefault_value()→ JSON[source]
+A default value to use for this argument when not explicitly set by the caller, if any.
+
+Returns
+:
+An arbitrary JSON-encoded value.
+
+Return type
+:
+JSON
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncdescription()→ str[source]
+A doc string for the argument, if any.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ FunctionArgID[source]
+A unique identifier for this FunctionArg.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The FunctionArgID scalar type represents an identifier for an object of type FunctionArg.
+
+Return type
+:
+FunctionArgID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the argument in lowerCamelCase format.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+type_def()→ TypeDef[source]
+The type of the argument.
+
+classdagger.FunctionArgID
+Bases: Scalar
+
+The FunctionArgID scalar type represents an identifier for an object of type FunctionArg.
+
+classdagger.FunctionCall(ctx: Context)
+Bases: Type
+
+An active function call.
+
+asyncid()→ FunctionCallID[source]
+A unique identifier for this FunctionCall.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The FunctionCallID scalar type represents an identifier for an object of type FunctionCall.
+
+Return type
+:
+FunctionCallID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncinput_args()→ list[FunctionCallArgValue][source]
+The argument values the function is being invoked with.
+
+asyncname()→ str[source]
+The name of the function being called.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncparent()→ JSON[source]
+The value of the parent object of the function being called. If the function is top-level to the module, this is always an empty object.
+
+Returns
+:
+An arbitrary JSON-encoded value.
+
+Return type
+:
+JSON
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncparent_name()→ str[source]
+The name of the parent object of the function being called. If the function is top-level to the module, this is the name of the module.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncreturn_value(value: JSON)→ Void | None[source]
+Set the return value of the function call to the provided value.
+
+Parameters
+:
+value – JSON serialization of the return value.
+
+Returns
+:
+The absence of a value. A Null Void is used as a placeholder for resolvers that do not return anything.
+
+Return type
+:
+Void | None
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.FunctionCallArgValue(ctx: Context)
+Bases: Type
+
+A value passed as a named argument to a function call.
+
+asyncid()→ FunctionCallArgValueID[source]
+A unique identifier for this FunctionCallArgValue.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The FunctionCallArgValueID scalar type represents an identifier for an object of type FunctionCallArgValue.
+
+Return type
+:
+FunctionCallArgValueID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the argument.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncvalue()→ JSON[source]
+The value of the argument represented as a JSON serialized string.
+
+Returns
+:
+An arbitrary JSON-encoded value.
+
+Return type
+:
+JSON
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.FunctionCallArgValueID
+Bases: Scalar
+
+The FunctionCallArgValueID scalar type represents an identifier for an object of type FunctionCallArgValue.
+
+classdagger.FunctionCallID
+Bases: Scalar
+
+The FunctionCallID scalar type represents an identifier for an object of type FunctionCall.
+
+classdagger.FunctionID
+Bases: Scalar
+
+The FunctionID scalar type represents an identifier for an object of type Function.
+
+classdagger.GeneratedCode(ctx: Context)
+Bases: Type
+
+The result of running an SDK’s codegen.
+
+code()→ Directory[source]
+The directory containing the generated code.
+
+asyncid()→ GeneratedCodeID[source]
+A unique identifier for this GeneratedCode.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The GeneratedCodeID scalar type represents an identifier for an object of type GeneratedCode.
+
+Return type
+:
+GeneratedCodeID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncvcs_generated_paths()→ list[str][source]
+List of paths to mark generated in version control (i.e. .gitattributes).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncvcs_ignored_paths()→ list[str][source]
+List of paths to ignore in version control (i.e. .gitignore).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+with_(cb: Callable[[GeneratedCode], GeneratedCode])→ GeneratedCode[source]
+Call the provided callable with current GeneratedCode.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_vcs_generated_paths(paths: list[str])→ Self[source]
+Set the list of paths to mark generated in version control.
+
+with_vcs_ignored_paths(paths: list[str])→ Self[source]
+Set the list of paths to ignore in version control.
+
+classdagger.GeneratedCodeID
+Bases: Scalar
+
+The GeneratedCodeID scalar type represents an identifier for an object of type GeneratedCode.
+
+classdagger.GitModuleSource(ctx: Context)
+Bases: Type
+
+Module source originating from a git repo.
+
+asyncclone_url()→ str[source]
+The URL to clone the root of the git repo from
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asynccommit()→ str[source]
+The resolved commit of the git repo this source points to.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+context_directory()→ Directory[source]
+The directory containing everything needed to load load and use the module.
+
+asynchtml_url()→ str[source]
+The URL to the source’s git repo in a web browser
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ GitModuleSourceID[source]
+A unique identifier for this GitModuleSource.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The GitModuleSourceID scalar type represents an identifier for an object of type GitModuleSource.
+
+Return type
+:
+GitModuleSourceID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncroot()→ str[source]
+The clean module name of the root of the module
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncroot_subpath()→ str[source]
+The path to the root of the module source under the context directory. This directory contains its configuration file. It also contains its source code (possibly as a subdirectory).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncversion()→ str[source]
+The specified version of the git repo this source points to.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.GitModuleSourceID
+Bases: Scalar
+
+The GitModuleSourceID scalar type represents an identifier for an object of type GitModuleSource.
+
+classdagger.GitRef(ctx: Context)
+Bases: Type
+
+A git ref (tag, branch, or commit).
+
+asynccommit()→ str[source]
+The resolved commit id at this ref.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ GitRefID[source]
+A unique identifier for this GitRef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The GitRefID scalar type represents an identifier for an object of type GitRef.
+
+Return type
+:
+GitRefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+tree()→ Directory[source]
+The filesystem tree at this ref.
+
+classdagger.GitRefID
+Bases: Scalar
+
+The GitRefID scalar type represents an identifier for an object of type GitRef.
+
+classdagger.GitRepository(ctx: Context)
+Bases: Type
+
+A git repository.
+
+branch(name: str)→ GitRef[source]
+Returns details of a branch.
+
+Parameters
+:
+name – Branch’s name (e.g., “main”).
+
+commit(id: str)→ GitRef[source]
+Returns details of a commit.
+
+Parameters
+:
+id – Identifier of the commit (e.g., “b6315d8f2810962c601af73f86831f6866ea798b”).
+
+head()→ GitRef[source]
+Returns details for HEAD.
+
+asyncid()→ GitRepositoryID[source]
+A unique identifier for this GitRepository.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The GitRepositoryID scalar type represents an identifier for an object of type GitRepository.
+
+Return type
+:
+GitRepositoryID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+ref(name: str)→ GitRef[source]
+Returns details of a ref.
+
+Parameters
+:
+name – Ref’s name (can be a commit identifier, a tag name, a branch name, or a fully-qualified ref).
+
+tag(name: str)→ GitRef[source]
+Returns details of a tag.
+
+Parameters
+:
+name – Tag’s name (e.g., “v0.3.9”).
+
+asynctags(*, patterns: list[str] | None = None)→ list[str][source]
+tags that match any of the given glob patterns.
+
+Parameters
+:
+patterns – Glob patterns (e.g., “refs/tags/v*”).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+with_(cb: Callable[[GitRepository], GitRepository])→ GitRepository[source]
+Call the provided callable with current GitRepository.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_auth_header(header: Secret)→ Self[source]
+Header to authenticate the remote with.
+
+Parameters
+:
+header – Secret used to populate the Authorization HTTP header
+
+with_auth_token(token: Secret)→ Self[source]
+Token to authenticate the remote with.
+
+Parameters
+:
+token – Secret used to populate the password during basic HTTP Authorization
+
+classdagger.GitRepositoryID
+Bases: Scalar
+
+The GitRepositoryID scalar type represents an identifier for an object of type GitRepository.
+
+classdagger.Host(ctx: Context)
+Bases: Type
+
+Information about the host environment.
+
+directory(path: str, *, exclude: list[str] | None = None, include: list[str] | None = None)→ Directory[source]
+Accesses a directory on the host.
+
+Parameters
+:
+path – Location of the directory to access (e.g., “.”).
+
+exclude – Exclude artifacts that match the given pattern (e.g., [“node_modules/”, “.git*”]).
+
+include – Include only artifacts that match the given pattern (e.g., [“app/”, “package.*”]).
+
+file(path: str)→ File[source]
+Accesses a file on the host.
+
+Parameters
+:
+path – Location of the file to retrieve (e.g., “README.md”).
+
+asyncid()→ HostID[source]
+A unique identifier for this Host.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The HostID scalar type represents an identifier for an object of type Host.
+
+Return type
+:
+HostID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+service(ports: list[PortForward], *, host: str | None = 'localhost')→ Service[source]
+Creates a service that forwards traffic to a specified address via the host.
+
+Parameters
+:
+ports – Ports to expose via the service, forwarding through the host network. If a port’s frontend is unspecified or 0, it defaults to the same as the backend port. An empty set of ports is not valid; an error will be returned.
+
+host – Upstream host to forward traffic to.
+
+set_secret_file(name: str, path: str)→ Secret[source]
+Sets a secret given a user-defined name and the file path on the host, and returns the secret.
+
+The file is limited to a size of 512000 bytes.
+
+Parameters
+:
+name – The user defined name for this secret.
+
+path – Location of the file to set as a secret.
+
+tunnel(service: Service, *, ports: list[PortForward] | None = None, native: bool | None = False)→ Service[source]
+Creates a tunnel that forwards traffic from the host to a service.
+
+Parameters
+:
+service – Service to send traffic from the tunnel.
+
+ports – Configure explicit port forwarding rules for the tunnel. If a port’s frontend is unspecified or 0, a random port will be chosen by the host. If no ports are given, all of the service’s ports are forwarded. If native is true, each port maps to the same port on the host. If native is false, each port maps to a random port chosen by the host. If ports are given and native is true, the ports are additive.
+
+native – Map each service port to the same port on the host, as if the service were running natively. Note: enabling may result in port conflicts.
+
+unix_socket(path: str)→ Socket[source]
+Accesses a Unix socket on the host.
+
+Parameters
+:
+path – Location of the Unix socket (e.g., “/var/run/docker.sock”).
+
+classdagger.HostID
+Bases: Scalar
+
+The HostID scalar type represents an identifier for an object of type Host.
+
+classdagger.ImageLayerCompression(value, names=<not given>, *values, module=None, qualname=None, type=None, start=1, boundary=None)
+Bases: Enum
+
+Compression algorithm to use for image layers.
+
+EStarGZ= 'EStarGZ'
+Gzip= 'Gzip'
+Uncompressed= 'Uncompressed'
+Zstd= 'Zstd'
+classdagger.ImageMediaTypes(value, names=<not given>, *values, module=None, qualname=None, type=None, start=1, boundary=None)
+Bases: Enum
+
+Mediatypes to use in published or exported image metadata.
+
+DockerMediaTypes= 'DockerMediaTypes'
+OCIMediaTypes= 'OCIMediaTypes'
+classdagger.InputTypeDef(ctx: Context)
+Bases: Type
+
+A graphql input type, which is essentially just a group of named args. This is currently only used to represent pre-existing usage of graphql input types in the core API. It is not used by user modules and shouldn’t ever be as user module accept input objects via their id rather than graphql input types.
+
+asyncfields()→ list[FieldTypeDef][source]
+Static fields defined on this input object, if any.
+
+asyncid()→ InputTypeDefID[source]
+A unique identifier for this InputTypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The InputTypeDefID scalar type represents an identifier for an object of type InputTypeDef.
+
+Return type
+:
+InputTypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the input object.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.InputTypeDefID
+Bases: Scalar
+
+The InputTypeDefID scalar type represents an identifier for an object of type InputTypeDef.
+
+classdagger.InterfaceTypeDef(ctx: Context)
+Bases: Type
+
+A definition of a custom interface defined in a Module.
+
+asyncdescription()→ str[source]
+The doc string for the interface, if any.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncfunctions()→ list[Function][source]
+Functions defined on this interface, if any.
+
+asyncid()→ InterfaceTypeDefID[source]
+A unique identifier for this InterfaceTypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The InterfaceTypeDefID scalar type represents an identifier for an object of type InterfaceTypeDef.
+
+Return type
+:
+InterfaceTypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the interface.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsource_module_name()→ str[source]
+If this InterfaceTypeDef is associated with a Module, the name of the module. Unset otherwise.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.InterfaceTypeDefID
+Bases: Scalar
+
+The InterfaceTypeDefID scalar type represents an identifier for an object of type InterfaceTypeDef.
+
+classdagger.JSON
+Bases: Scalar
+
+An arbitrary JSON-encoded value.
+
+classdagger.Label(ctx: Context)
+Bases: Type
+
+A simple key value object that represents a label.
+
+asyncid()→ LabelID[source]
+A unique identifier for this Label.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The LabelID scalar type represents an identifier for an object of type Label.
+
+Return type
+:
+LabelID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The label name.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncvalue()→ str[source]
+The label value.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.LabelID
+Bases: Scalar
+
+The LabelID scalar type represents an identifier for an object of type Label.
+
+classdagger.ListTypeDef(ctx: Context)
+Bases: Type
+
+A definition of a list type in a Module.
+
+element_type_def()→ TypeDef[source]
+The type of the elements in the list.
+
+asyncid()→ ListTypeDefID[source]
+A unique identifier for this ListTypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ListTypeDefID scalar type represents an identifier for an object of type ListTypeDef.
+
+Return type
+:
+ListTypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.ListTypeDefID
+Bases: Scalar
+
+The ListTypeDefID scalar type represents an identifier for an object of type ListTypeDef.
+
+classdagger.LocalModuleSource(ctx: Context)
+Bases: Type
+
+Module source that that originates from a path locally relative to an arbitrary directory.
+
+context_directory()→ Directory[source]
+The directory containing everything needed to load load and use the module.
+
+asyncid()→ LocalModuleSourceID[source]
+A unique identifier for this LocalModuleSource.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The LocalModuleSourceID scalar type represents an identifier for an object of type LocalModuleSource.
+
+Return type
+:
+LocalModuleSourceID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncroot_subpath()→ str[source]
+The path to the root of the module source under the context directory. This directory contains its configuration file. It also contains its source code (possibly as a subdirectory).
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.LocalModuleSourceID
+Bases: Scalar
+
+The LocalModuleSourceID scalar type represents an identifier for an object of type LocalModuleSource.
+
+classdagger.Module(ctx: Context)
+Bases: Type
+
+A Dagger module.
+
+asyncdependencies()→ list[Module][source]
+Modules used by this module.
+
+asyncdependency_config()→ list[ModuleDependency][source]
+The dependencies as configured by the module.
+
+asyncdescription()→ str[source]
+The doc string of the module, if any
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncenums()→ list[TypeDef][source]
+Enumerations served by this module.
+
+generated_context_diff()→ Directory[source]
+The generated files and directories made on top of the module source’s context directory.
+
+generated_context_directory()→ Directory[source]
+The module source’s context plus any configuration and source files created by codegen.
+
+asyncid()→ ModuleID[source]
+A unique identifier for this Module.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ModuleID scalar type represents an identifier for an object of type Module.
+
+Return type
+:
+ModuleID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+initialize()→ Self[source]
+Retrieves the module with the objects loaded via its SDK.
+
+asyncinterfaces()→ list[TypeDef][source]
+Interfaces served by this module.
+
+asyncname()→ str[source]
+The name of the module
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncobjects()→ list[TypeDef][source]
+Objects served by this module.
+
+runtime()→ Container[source]
+The container that runs the module’s entrypoint. It will fail to execute if the module doesn’t compile.
+
+asyncsdk()→ str[source]
+The SDK used by this module. Either a name of a builtin SDK or a module source ref string pointing to the SDK’s implementation.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncserve()→ Void | None[source]
+Serve a module’s API in the current session.
+
+Note: this can only be called once per session. In the future, it could return a stream or service to remove the side effect.
+
+Returns
+:
+The absence of a value. A Null Void is used as a placeholder for resolvers that do not return anything.
+
+Return type
+:
+Void | None
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+source()→ ModuleSource[source]
+The source for the module.
+
+with_(cb: Callable[[Module], Module])→ Module[source]
+Call the provided callable with current Module.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_description(description: str)→ Self[source]
+Retrieves the module with the given description
+
+Parameters
+:
+description – The description to set
+
+with_enum(enum: TypeDef)→ Self[source]
+This module plus the given Enum type and associated values
+
+with_interface(iface: TypeDef)→ Self[source]
+This module plus the given Interface type and associated functions
+
+with_object(object: TypeDef)→ Self[source]
+This module plus the given Object type and associated functions.
+
+with_source(source: ModuleSource, *, engine_version: str | None = None)→ Self[source]
+Retrieves the module with basic configuration loaded if present.
+
+Parameters
+:
+source – The module source to initialize from.
+
+engine_version – The engine version to upgrade to.
+
+classdagger.ModuleDependency(ctx: Context)
+Bases: Type
+
+The configuration of dependency of a module.
+
+asyncid()→ ModuleDependencyID[source]
+A unique identifier for this ModuleDependency.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ModuleDependencyID scalar type represents an identifier for an object of type ModuleDependency.
+
+Return type
+:
+ModuleDependencyID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the dependency module.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+source()→ ModuleSource[source]
+The source for the dependency module.
+
+classdagger.ModuleDependencyID
+Bases: Scalar
+
+The ModuleDependencyID scalar type represents an identifier for an object of type ModuleDependency.
+
+classdagger.ModuleID
+Bases: Scalar
+
+The ModuleID scalar type represents an identifier for an object of type Module.
+
+classdagger.ModuleSource(ctx: Context)
+Bases: Type
+
+The source needed to load and run a module, along with any metadata about the source such as versions/urls/etc.
+
+as_git_source()→ GitModuleSource[source]
+If the source is a of kind git, the git source representation of it.
+
+as_local_source()→ LocalModuleSource[source]
+If the source is of kind local, the local source representation of it.
+
+as_module(*, engine_version: str | None = None)→ Module[source]
+Load the source as a module. If this is a local source, the parent directory must have been provided during module source creation
+
+Parameters
+:
+engine_version – The engine version to upgrade to.
+
+asyncas_string()→ str[source]
+A human readable ref string representation of this module source.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncconfig_exists()→ bool[source]
+Returns whether the module source has a configuration file.
+
+Returns
+:
+The Boolean scalar type represents true or false.
+
+Return type
+:
+bool
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+context_directory()→ Directory[source]
+The directory containing everything needed to load load and use the module.
+
+asyncdependencies()→ list[ModuleDependency][source]
+The dependencies of the module source. Includes dependencies from the configuration and any extras from withDependencies calls.
+
+directory(path: str)→ Directory[source]
+The directory containing the module configuration and source code (source code may be in a subdir).
+
+Parameters
+:
+path – The path from the source directory to select.
+
+asyncid()→ ModuleSourceID[source]
+A unique identifier for this ModuleSource.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ModuleSourceID scalar type represents an identifier for an object of type ModuleSource.
+
+Return type
+:
+ModuleSourceID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asynckind()→ ModuleSourceKind[source]
+The kind of source (e.g. local, git, etc.)
+
+Returns
+:
+The kind of module source.
+
+Return type
+:
+ModuleSourceKind
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncmodule_name()→ str[source]
+If set, the name of the module this source references, including any overrides at runtime by callers.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncmodule_original_name()→ str[source]
+The original name of the module this source references, as defined in the module configuration.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncresolve_context_path_from_caller()→ str[source]
+The path to the module source’s context directory on the caller’s filesystem. Only valid for local sources.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+resolve_dependency(dep: Self)→ Self[source]
+Resolve the provided module source arg as a dependency relative to this module source.
+
+Parameters
+:
+dep – The dependency module source to resolve.
+
+resolve_directory_from_caller(path: str, *, view_name: str | None = None)→ Directory[source]
+Load a directory from the caller optionally with a given view applied.
+
+Parameters
+:
+path – The path on the caller’s filesystem to load.
+
+view_name – If set, the name of the view to apply to the path.
+
+resolve_from_caller()→ Self[source]
+Load the source from its path on the caller’s filesystem, including only needed+configured files and directories. Only valid for local sources.
+
+asyncsource_root_subpath()→ str[source]
+The path relative to context of the root of the module source, which contains dagger.json. It also contains the module implementation source code, but that may or may not being a subdir of this root.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsource_subpath()→ str[source]
+The path relative to context of the module implementation source code.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+view(name: str)→ ModuleSourceView[source]
+Retrieve a named view defined for this module source.
+
+Parameters
+:
+name – The name of the view to retrieve.
+
+asyncviews()→ list[ModuleSourceView][source]
+The named views defined for this module source, which are sets of directory filters that can be applied to directory arguments provided to functions.
+
+with_(cb: Callable[[ModuleSource], ModuleSource])→ ModuleSource[source]
+Call the provided callable with current ModuleSource.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_context_directory(dir: Directory)→ Self[source]
+Update the module source with a new context directory. Only valid for local sources.
+
+Parameters
+:
+dir – The directory to set as the context directory.
+
+with_dependencies(dependencies: list[ModuleDependency])→ Self[source]
+Append the provided dependencies to the module source’s dependency list.
+
+Parameters
+:
+dependencies – The dependencies to append.
+
+with_init(*, merge: bool | None = False)→ Self[source]
+Sets module init arguments
+
+Parameters
+:
+merge – Merge module dependencies into the current project’s
+
+with_name(name: str)→ Self[source]
+Update the module source with a new name.
+
+Parameters
+:
+name – The name to set.
+
+with_sdk(sdk: str)→ Self[source]
+Update the module source with a new SDK.
+
+Parameters
+:
+sdk – The SDK to set.
+
+with_source_subpath(path: str)→ Self[source]
+Update the module source with a new source subpath.
+
+Parameters
+:
+path – The path to set as the source subpath.
+
+with_view(name: str, patterns: list[str])→ Self[source]
+Update the module source with a new named view.
+
+Parameters
+:
+name – The name of the view to set.
+
+patterns – The patterns to set as the view filters.
+
+classdagger.ModuleSourceID
+Bases: Scalar
+
+The ModuleSourceID scalar type represents an identifier for an object of type ModuleSource.
+
+classdagger.ModuleSourceKind(value, names=<not given>, *values, module=None, qualname=None, type=None, start=1, boundary=None)
+Bases: Enum
+
+The kind of module source.
+
+GIT_SOURCE= 'GIT_SOURCE'
+LOCAL_SOURCE= 'LOCAL_SOURCE'
+classdagger.ModuleSourceView(ctx: Context)
+Bases: Type
+
+A named set of path filters that can be applied to directory arguments provided to functions.
+
+asyncid()→ ModuleSourceViewID[source]
+A unique identifier for this ModuleSourceView.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ModuleSourceViewID scalar type represents an identifier for an object of type ModuleSourceView.
+
+Return type
+:
+ModuleSourceViewID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the view
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncpatterns()→ list[str][source]
+The patterns of the view used to filter paths
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+list[str]
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.ModuleSourceViewID
+Bases: Scalar
+
+The ModuleSourceViewID scalar type represents an identifier for an object of type ModuleSourceView.
+
+classdagger.NetworkProtocol(value, names=<not given>, *values, module=None, qualname=None, type=None, start=1, boundary=None)
+Bases: Enum
+
+Transport layer network protocol associated to a port.
+
+TCP= 'TCP'
+UDP= 'UDP'
+classdagger.ObjectTypeDef(ctx: Context)
+Bases: Type
+
+A definition of a custom object defined in a Module.
+
+constructor()→ Function[source]
+The function used to construct new instances of this object, if any
+
+asyncdescription()→ str[source]
+The doc string for the object, if any.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncfields()→ list[FieldTypeDef][source]
+Static fields defined on this object, if any.
+
+asyncfunctions()→ list[Function][source]
+Functions defined on this object, if any.
+
+asyncid()→ ObjectTypeDefID[source]
+A unique identifier for this ObjectTypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ObjectTypeDefID scalar type represents an identifier for an object of type ObjectTypeDef.
+
+Return type
+:
+ObjectTypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the object.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsource_module_name()→ str[source]
+If this ObjectTypeDef is associated with a Module, the name of the module. Unset otherwise.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.ObjectTypeDefID
+Bases: Scalar
+
+The ObjectTypeDefID scalar type represents an identifier for an object of type ObjectTypeDef.
+
+classdagger.PipelineLabel(name: str, value: str)
+Bases: Input
+
+Key value object that represents a pipeline label.
+
+name: str
+value: str
+classdagger.Platform
+Bases: Scalar
+
+The platform config OS and architecture in a Container. The format is [os]/[platform]/[version] (e.g., “darwin/arm64/v7”, “windows/amd64”, “linux/arm64”).
+
+classdagger.Port(ctx: Context)
+Bases: Type
+
+A port exposed by a container.
+
+asyncdescription()→ str | None[source]
+The port description.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str | None
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncexperimental_skip_healthcheck()→ bool[source]
+Skip the health check when run as a service.
+
+Returns
+:
+The Boolean scalar type represents true or false.
+
+Return type
+:
+bool
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ PortID[source]
+A unique identifier for this Port.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The PortID scalar type represents an identifier for an object of type Port.
+
+Return type
+:
+PortID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncport()→ int[source]
+The port number.
+
+Returns
+:
+The Int scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+
+Return type
+:
+int
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncprotocol()→ NetworkProtocol[source]
+The transport layer protocol.
+
+Returns
+:
+Transport layer network protocol associated to a port.
+
+Return type
+:
+NetworkProtocol
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.PortForward(backend: int, frontend: int | None = None, protocol: NetworkProtocol | None = NetworkProtocol.TCP)
+Bases: Input
+
+Port forwarding rules for tunneling network traffic.
+
+backend: int
+frontend: int | None
+protocol: NetworkProtocol | None
+classdagger.PortID
+Bases: Scalar
+
+The PortID scalar type represents an identifier for an object of type Port.
+
+classdagger.ScalarTypeDef(ctx: Context)
+Bases: Type
+
+A definition of a custom scalar defined in a Module.
+
+asyncdescription()→ str[source]
+A doc string for the scalar, if any.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ ScalarTypeDefID[source]
+A unique identifier for this ScalarTypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ScalarTypeDefID scalar type represents an identifier for an object of type ScalarTypeDef.
+
+Return type
+:
+ScalarTypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of the scalar.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsource_module_name()→ str[source]
+If this ScalarTypeDef is associated with a Module, the name of the module. Unset otherwise.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.ScalarTypeDefID
+Bases: Scalar
+
+The ScalarTypeDefID scalar type represents an identifier for an object of type ScalarTypeDef.
+
+classdagger.Secret(ctx: Context)
+Bases: Type
+
+A reference to a secret value, which can be handled more safely than the value itself.
+
+asyncid()→ SecretID[source]
+A unique identifier for this Secret.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The SecretID scalar type represents an identifier for an object of type Secret.
+
+Return type
+:
+SecretID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncname()→ str[source]
+The name of this secret.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncplaintext()→ str[source]
+The value of this secret.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.SecretID
+Bases: Scalar
+
+The SecretID scalar type represents an identifier for an object of type Secret.
+
+classdagger.Service(ctx: Context)
+Bases: Type
+
+A content-addressed service providing TCP connectivity.
+
+asyncendpoint(*, port: int | None = None, scheme: str | None = '')→ str[source]
+Retrieves an endpoint that clients can use to reach this container.
+
+If no port is specified, the first exposed port is used. If none exist an error is returned.
+
+If a scheme is specified, a URL is returned. Otherwise, a host:port pair is returned.
+
+Parameters
+:
+port – The exposed port number for the endpoint
+
+scheme – Return a URL with the given scheme, eg. http for http://
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asynchostname()→ str[source]
+Retrieves a hostname which can be used by clients to reach this container.
+
+Returns
+:
+The String scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+Return type
+:
+str
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncid()→ ServiceID[source]
+A unique identifier for this Service.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The ServiceID scalar type represents an identifier for an object of type Service.
+
+Return type
+:
+ServiceID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncports()→ list[Port][source]
+Retrieves the list of ports provided by the service.
+
+asyncstart()→ Self[source]
+Start the service and wait for its health checks to succeed.
+
+Services bound to a Container do not need to be manually started.
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncstop(*, kill: bool | None = False)→ Self[source]
+Stop the service.
+
+Parameters
+:
+kill – Immediately kill the service without waiting for a graceful exit
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncup(*, ports: list[PortForward] | None = None, random: bool | None = False)→ Void | None[source]
+Creates a tunnel that forwards traffic from the caller’s network to this service.
+
+Parameters
+:
+ports – List of frontend/backend port mappings to forward. Frontend is the port accepting traffic on the host, backend is the service port.
+
+random – Bind each tunnel port to a random port on the host.
+
+Returns
+:
+The absence of a value. A Null Void is used as a placeholder for resolvers that do not return anything.
+
+Return type
+:
+Void | None
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.ServiceID
+Bases: Scalar
+
+The ServiceID scalar type represents an identifier for an object of type Service.
+
+classdagger.Socket(ctx: Context)
+Bases: Type
+
+A Unix or TCP/IP socket that can be mounted into a container.
+
+asyncid()→ SocketID[source]
+A unique identifier for this Socket.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The SocketID scalar type represents an identifier for an object of type Socket.
+
+Return type
+:
+SocketID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.SocketID
+Bases: Scalar
+
+The SocketID scalar type represents an identifier for an object of type Socket.
+
+classdagger.Terminal(ctx: Context)
+Bases: Type
+
+An interactive terminal that clients can connect to.
+
+asyncid()→ TerminalID[source]
+A unique identifier for this Terminal.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The TerminalID scalar type represents an identifier for an object of type Terminal.
+
+Return type
+:
+TerminalID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncsync()→ Self[source]
+Forces evaluation of the pipeline in the engine.
+
+It doesn’t run the default command if no exec has been set.
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+classdagger.TerminalID
+Bases: Scalar
+
+The TerminalID scalar type represents an identifier for an object of type Terminal.
+
+classdagger.TypeDef(ctx: Context)
+Bases: Type
+
+A definition of a parameter or return type in a Module.
+
+as_enum()→ EnumTypeDef[source]
+If kind is ENUM, the enum-specific type definition. If kind is not ENUM, this will be null.
+
+as_input()→ InputTypeDef[source]
+If kind is INPUT, the input-specific type definition. If kind is not INPUT, this will be null.
+
+as_interface()→ InterfaceTypeDef[source]
+If kind is INTERFACE, the interface-specific type definition. If kind is not INTERFACE, this will be null.
+
+as_list()→ ListTypeDef[source]
+If kind is LIST, the list-specific type definition. If kind is not LIST, this will be null.
+
+as_object()→ ObjectTypeDef[source]
+If kind is OBJECT, the object-specific type definition. If kind is not OBJECT, this will be null.
+
+as_scalar()→ ScalarTypeDef[source]
+If kind is SCALAR, the scalar-specific type definition. If kind is not SCALAR, this will be null.
+
+asyncid()→ TypeDefID[source]
+A unique identifier for this TypeDef.
+
+Note
+
+This is lazily evaluated, no operation is actually run.
+
+Returns
+:
+The TypeDefID scalar type represents an identifier for an object of type TypeDef.
+
+Return type
+:
+TypeDefID
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asynckind()→ TypeDefKind[source]
+The kind of type this is (e.g. primitive, list, object).
+
+Returns
+:
+Distinguishes the different kinds of TypeDefs.
+
+Return type
+:
+TypeDefKind
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+asyncoptional()→ bool[source]
+Whether this type can be set to null. Defaults to false.
+
+Returns
+:
+The Boolean scalar type represents true or false.
+
+Return type
+:
+bool
+
+Raises
+:
+ExecuteTimeoutError – If the time to execute the query exceeds the configured timeout.
+
+QueryError – If the API returns an error.
+
+with_(cb: Callable[[TypeDef], TypeDef])→ TypeDef[source]
+Call the provided callable with current TypeDef.
+
+This is useful for reusability and readability by not breaking the calling chain.
+
+with_constructor(function: Function)→ Self[source]
+Adds a function for constructing a new instance of an Object TypeDef, failing if the type is not an object.
+
+with_enum(name: str, *, description: str | None = '')→ Self[source]
+Returns a TypeDef of kind Enum with the provided name.
+
+Note that an enum’s values may be omitted if the intent is only to refer to an enum. This is how functions are able to return their own, or any other circular reference.
+
+Parameters
+:
+name – The name of the enum
+
+description – A doc string for the enum, if any
+
+with_enum_value(value: str, *, description: str | None = '')→ Self[source]
+Adds a static value for an Enum TypeDef, failing if the type is not an enum.
+
+Parameters
+:
+value – The name of the value in the enum
+
+description – A doc string for the value, if any
+
+with_field(name: str, type_def: Self, *, description: str | None = '')→ Self[source]
+Adds a static field for an Object TypeDef, failing if the type is not an object.
+
+Parameters
+:
+name – The name of the field in the object
+
+type_def – The type of the field
+
+description – A doc string for the field, if any
+
+with_function(function: Function)→ Self[source]
+Adds a function for an Object or Interface TypeDef, failing if the type is not one of those kinds.
+
+with_interface(name: str, *, description: str | None = '')→ Self[source]
+Returns a TypeDef of kind Interface with the provided name.
+
+with_kind(kind: TypeDefKind)→ Self[source]
+Sets the kind of the type.
+
+with_list_of(element_type: Self)→ Self[source]
+Returns a TypeDef of kind List with the provided type for its elements.
+
+with_object(name: str, *, description: str | None = '')→ Self[source]
+Returns a TypeDef of kind Object with the provided name.
+
+Note that an object’s fields and functions may be omitted if the intent is only to refer to an object. This is how functions are able to return their own object, or any other circular reference.
+
+with_optional(optional: bool)→ Self[source]
+Sets whether this type can be set to null.
+
+with_scalar(name: str, *, description: str | None = '')→ Self[source]
+Returns a TypeDef of kind Scalar with the provided name.
+
+classdagger.TypeDefID
+Bases: Scalar
+
+The TypeDefID scalar type represents an identifier for an object of type TypeDef.
+
+classdagger.TypeDefKind(value, names=<not given>, *values, module=None, qualname=None, type=None, start=1, boundary=None)
+Bases: Enum
+
+Distinguishes the different kinds of TypeDefs.
+
+BOOLEAN_KIND= 'BOOLEAN_KIND'
+ENUM_KIND= 'ENUM_KIND'
+INPUT_KIND= 'INPUT_KIND'
+INTEGER_KIND= 'INTEGER_KIND'
+INTERFACE_KIND= 'INTERFACE_KIND'
+LIST_KIND= 'LIST_KIND'
+OBJECT_KIND= 'OBJECT_KIND'
+SCALAR_KIND= 'SCALAR_KIND'
+STRING_KIND= 'STRING_KIND'
+VOID_KIND= 'VOID_KIND'
+classdagger.Void
+Bases: Scalar
+
+The absence of a value. A Null Void is used as a placeholder for resolvers that do not return anything.
+
+© Copyright 2022, Dagger.
+
+Built with Sphinx using a theme provided by Read the Docs.
+Read the Docs
+ sdk-python-v0.12.5

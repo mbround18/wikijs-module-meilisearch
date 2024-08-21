@@ -1,0 +1,21 @@
+key: millisearch
+title: Millisearch Engine
+author: Your Name
+isAvailable: true
+props:
+  millisearchHost:
+    type: String
+    description: "The URL or IP address where the Millisearch server is hosted."
+    default: "http://millisearch:7700"
+  millisearchApiKey:
+    type: String
+    description: "API key for authenticating requests to the Millisearch server."
+    default: "demo"
+  indexName:
+    type: String
+    description: "The name of the index in Millisearch that will be used for the Wiki.js search."
+    default: "wiki_index"
+  timeout:
+    type: Number
+    description: "Timeout for search requests in milliseconds."
+    default: 5000
