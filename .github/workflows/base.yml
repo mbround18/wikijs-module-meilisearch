@@ -29,7 +29,8 @@ jobs:
 
       - name: Setup System
         run: |
-          sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev zip
+          sudo apt-get update && sudo apt-get install --no-recommends -y cmake pkg-config libssl-dev zip
+          make setup
           make build
 
       - name: Create ZIP file
