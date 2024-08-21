@@ -1,7 +1,9 @@
 key: millisearch
 title: Millisearch Engine
-author: Your Name
+author: mbround18
 isAvailable: true
+logo: https://raw.githubusercontent.com/mbround18/wikijs-module-millisearch/main/docs/assets/logo.png
+website: https://github.com/mbround18/wikijs-module-millisearch
 props:
   millisearchHost:
     type: String
