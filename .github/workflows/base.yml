@@ -42,17 +42,13 @@ jobs:
           git fetch --prune --unshallow
           git diff --name-only HEAD^ HEAD | grep VERSION || echo "no changes"
 
-      - name: Create Release Tag
+      - name: Create Release Tag and Upload
         if: steps.check_version.outputs.result != 'no changes'
+        id: create_release
         run: |
           VERSION=$(cat VERSION)
           TAG="v$VERSION"
-          git tag $TAG
-          git push origin $TAG
-
-      - name: Upload Release
-        if: steps.check_version.outputs.result != 'no changes'
-        uses: actions/upload-artifact@v4
-        with:
-          name: millisearch
-          path: millisearch.zip
+          echo "Creating Release $TAG"
+          gh release create $TAG millisearch.zip --title "$TAG" --notes "Release notes for version $VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
