@@ -1,7 +1,6 @@
 mod logger;
 mod page;
 mod query;
-mod transformers;
 
 use crate::page::RenamedWikiPage;
 use crate::query::{PageSearchResponse, SerializableSearchResult};
@@ -64,15 +63,7 @@ impl WikiSearchEngine {
                 })
             })?;
 
-        if page.is_published && !page.is_private {
-            operation(page).await
-        } else {
-            log::warn!(
-                "Skipping operation on unpublished or private page: {}",
-                page.id
-            );
-            Ok(())
-        }
+        operation(page).await
     }
 
     async fn add_document(&self, page: WikiPage) -> Result<(), JsValue> {

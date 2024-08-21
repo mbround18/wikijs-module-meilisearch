@@ -1,4 +1,3 @@
-use crate::transformers::{bool_from_int, bool_to_int};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -9,10 +8,6 @@ pub struct WikiPage {
     pub(crate) hash: String,
     title: String,
     description: String,
-    #[serde(deserialize_with = "bool_from_int", serialize_with = "bool_to_int")]
-    pub(crate) is_private: bool,
-    #[serde(deserialize_with = "bool_from_int", serialize_with = "bool_to_int")]
-    pub(crate) is_published: bool,
     pub(crate) content: String,
     content_type: String,
     created_at: String,
@@ -31,8 +26,6 @@ impl From<RenamedWikiPage> for WikiPage {
             hash: renamed.destination_hash,
             title: renamed.title,
             description: renamed.description,
-            is_private: renamed.is_private,
-            is_published: renamed.is_published,
             content: renamed.content,
             content_type: renamed.content_type,
             created_at: renamed.created_at,
@@ -53,10 +46,6 @@ pub(crate) struct RenamedWikiPage {
     hash: String,
     title: String,
     description: String,
-    #[serde(deserialize_with = "bool_from_int", serialize_with = "bool_to_int")]
-    pub(crate) is_private: bool,
-    #[serde(deserialize_with = "bool_from_int", serialize_with = "bool_to_int")]
-    pub(crate) is_published: bool,
     content: String,
     content_type: String,
     created_at: String,

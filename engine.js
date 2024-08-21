@@ -76,6 +76,22 @@ async function getSearchEngine({
   return searchEngine;
 }
 
+function rejectIfIsPrivateAndNotPublished(page, action) {
+  if (!page.isPublished) {
+    logger.warn(
+      `(SEARCH/MEILISEARCH) SKIPPING: Page with path ${page.path} is not published.`,
+    );
+    return Promise.resolve();
+  } else if (page.isPrivate) {
+    logger.warn(
+      `(SEARCH/MEILISEARCH) SKIPPING: Page with path ${page.path} is private.`,
+    );
+    return Promise.resolve();
+  } else {
+    return action(page);
+  }
+}
+
 module.exports = {
   /**
    * ACTIVATE
@@ -195,14 +211,16 @@ module.exports = {
    * @param {Object} page Page to create
    */
   async created(page) {
-    logger.info(
-      `(SEARCH/MEILISEARCH) Creating search index for page: ${page.path}`,
-    );
-    const engine = await getSearchEngine(this.config);
-    await engine.created(page);
-    logger.info(
-      `(SEARCH/MEILISEARCH) Search index created for page: ${page.path}`,
-    );
+    await rejectIfIsPrivateAndNotPublished(page, async (page) => {
+      logger.info(
+        `(SEARCH/MEILISEARCH) Creating search index for page: ${page.path}`,
+      );
+      const engine = await getSearchEngine(this.config);
+      await engine.created(page);
+      logger.info(
+        `(SEARCH/MEILISEARCH) Search index created for page: ${page.path}`,
+      );
+    });
   },
   /**
    * UPDATE
@@ -210,14 +228,16 @@ module.exports = {
    * @param {Object} page Page to update
    */
   async updated(page) {
-    logger.info(
-      `(SEARCH/MEILISEARCH) Updating search index for page: ${page.path}`,
-    );
-    const engine = await getSearchEngine(this.config);
-    await engine.updated(page);
-    logger.info(
-      `(SEARCH/MEILISEARCH) Search index updated for page: ${page.path}`,
-    );
+    await rejectIfIsPrivateAndNotPublished(page, async (page) => {
+      logger.info(
+        `(SEARCH/MEILISEARCH) Updating search index for page: ${page.path}`,
+      );
+      const engine = await getSearchEngine(this.config);
+      await engine.updated(page);
+      logger.info(
+        `(SEARCH/MEILISEARCH) Search index updated for page: ${page.path}`,
+      );
+    });
   },
   /**
    * DELETE
@@ -225,14 +245,16 @@ module.exports = {
    * @param {Object} page Page to delete
    */
   async deleted(page) {
-    logger.info(
-      `(SEARCH/MEILISEARCH) Deleting search index for page: ${page.path}`,
-    );
-    const engine = await getSearchEngine(this.config);
-    await engine.deleted(page);
-    logger.info(
-      `(SEARCH/MEILISEARCH) Search index deleted for page: ${page.path}`,
-    );
+    await rejectIfIsPrivateAndNotPublished(page, async (page) => {
+      logger.info(
+        `(SEARCH/MEILISEARCH) Deleting search index for page: ${page.path}`,
+      );
+      const engine = await getSearchEngine(this.config);
+      await engine.deleted(page);
+      logger.info(
+        `(SEARCH/MEILISEARCH) Search index deleted for page: ${page.path}`,
+      );
+    });
   },
   /**
    * RENAME
@@ -240,14 +262,16 @@ module.exports = {
    * @param {Object} page Page to rename
    */
   async renamed(page) {
-    logger.info(
-      `(SEARCH/MEILISEARCH) Renaming search index for page: ${page.path}`,
-    );
-    const engine = await getSearchEngine(this.config);
-    await engine.updated(page);
-    logger.info(
-      `(SEARCH/MEILISEARCH) Search index renamed for page: ${page.destinationPath}`,
-    );
+    await rejectIfIsPrivateAndNotPublished(page, async (page) => {
+      logger.info(
+        `(SEARCH/MEILISEARCH) Renaming search index for page: ${page.path}`,
+      );
+      const engine = await getSearchEngine(this.config);
+      await engine.updated(page);
+      logger.info(
+        `(SEARCH/MEILISEARCH) Search index renamed for page: ${page.destinationPath}`,
+      );
+    });
   },
   /**
    * REBUILD INDEX
