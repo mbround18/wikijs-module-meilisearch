@@ -46,7 +46,7 @@ lint: ## Run linters on the Rust code
 	@echo "Running linters..."
 	@cargo fmt -- --check
 	@cargo clippy -- -D warnings
-	@npx -y prettier --write ./*.{js,md,yaml,yml}
+	@npx -y prettier --write ./{*,.github/**/*}.{js,md,yaml,yml}
 
 clean: ## Clean up the project
 	@echo "Cleaning up..."

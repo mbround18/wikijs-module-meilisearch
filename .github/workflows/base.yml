@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Rust
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
           target: wasm32-unknown-unknown
@@ -40,7 +40,11 @@ jobs:
         id: check_version
         run: |
           git fetch --prune --unshallow
-          git diff --name-only HEAD^ HEAD | grep VERSION || echo "no changes"
+          if git diff --name-only HEAD^ HEAD | grep -q VERSION; then
+            echo "result=changes" >> $GITHUB_OUTPUT
+          else
+            echo "result=\"no changes\"" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create Release Tag and Upload
         if: steps.check_version.outputs.result != 'no changes'
