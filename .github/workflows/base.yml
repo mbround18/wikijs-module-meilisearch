@@ -1,0 +1,58 @@
+name: Build and Release WASM
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          components: rustfmt, clippy
+
+      - name: Rustfmt Check
+        uses: actions-rust-lang/rustfmt@v1
+
+      - name: Setup System
+        run: |
+          sudo apt-get update && sudo apt-get install -y cmake pkg-config libssl-dev zip
+          make build
+
+      - name: Create ZIP file
+        run: |
+          zip -r millisearch.zip pkg/*
+
+      - name: Check for VERSION changes
+        id: check_version
+        run: |
+          git fetch --prune --unshallow
+          git diff --name-only HEAD^ HEAD | grep VERSION || echo "no changes"
+
+      - name: Create Release Tag
+        if: steps.check_version.outputs.result != 'no changes'
+        run: |
+          VERSION=$(cat VERSION)
+          TAG="v$VERSION"
+          git tag $TAG
+          git push origin $TAG
+
+      - name: Upload Release
+        if: steps.check_version.outputs.result != 'no changes'
+        uses: actions/upload-artifact@v4
+        with:
+          name: millisearch
+          path: millisearch.zip
