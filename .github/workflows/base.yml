@@ -51,4 +51,4 @@ jobs:
           echo "Creating Release $TAG"
           gh release create $TAG millisearch.zip --title "$TAG" --notes "Release notes for version $VERSION"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
