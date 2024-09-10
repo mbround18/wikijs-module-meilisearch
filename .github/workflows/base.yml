@@ -56,6 +56,7 @@ jobs:
           cd pkg && zip -r ../meilisearch.zip ./*
 
       - name: Check for VERSION changes
+        if: github.ref == 'refs/heads/main'  # Ensure this is the default branch
         id: check_version
         run: |
           VERSION=$(cat VERSION)
@@ -68,7 +69,7 @@ jobs:
           fi
 
       - name: Create Release Tag and Upload
-        if: steps.check_version.outputs.result != 'no changes'
+        if: github.ref == 'refs/heads/main' && steps.check_version.outputs.result != 'no changes'
         id: create_release
         run: |
           VERSION=$(cat VERSION)
