@@ -9,13 +9,13 @@ use meilisearch_sdk::client::Client;
 use meilisearch_sdk::documents::DocumentDeletionQuery;
 use page::WikiPage;
 use serde_wasm_bindgen::{from_value, to_value};
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct WikiSearchEngine {
     client: Client,
-    index_name: String,
+    base_index_name: String,
 }
 
 impl WikiSearchEngine {
@@ -26,9 +26,9 @@ impl WikiSearchEngine {
 
     async fn execute_query(&self, q: &str) -> Result<SerializableSearchResult, JsValue> {
         log::info!("Executing query: {}", q);
-
+        let index_name = &self.base_index_name;
         self.client
-            .index(&self.index_name)
+            .index(index_name)
             .search()
             .with_attributes_to_search_on(&[
                 "title",
@@ -54,22 +54,20 @@ impl WikiSearchEngine {
         Fut: std::future::Future<Output = Result<(), JsValue>>,
     {
         let page = from_value::<RenamedWikiPage>(page.clone())
-            .map(WikiPage::from) // Directly map to WikiPage if successful
+            .map(WikiPage::from)
             .or_else(|_e| {
-                // If deserialization to RenamedWikiPage fails, try deserializing to WikiPage
                 from_value::<WikiPage>(page.clone()).map_err(|inner_e| {
-                    // If both deserialization fail, log the error and return a JS error
                     Self::log_and_return_js_error("Error deserializing page", inner_e)
                 })
             })?;
-
         operation(page).await
     }
 
     async fn add_document(&self, page: WikiPage) -> Result<(), JsValue> {
         log::info!("Adding document: {:?}", serde_json::to_string_pretty(&page));
+        let index_name = &self.base_index_name;
         self.client
-            .index(&self.index_name)
+            .index(index_name)
             .add_documents(&[page], Some("id"))
             .await
             .map(|_| ())
@@ -83,7 +81,7 @@ impl WikiSearchEngine {
     pub fn new(
         meilisearch_host: String,
         meilisearch_api_key: String,
-        index_name: String,
+        base_index_name: String,
         _timeout: u64,
     ) -> Result<WikiSearchEngine, JsValue> {
         WasmLogger::init("meilisearch::WikiSearchEngine");
@@ -92,9 +90,15 @@ impl WikiSearchEngine {
         let client = Client::new(host.clone(), Some(meilisearch_api_key))
             .map_err(|e| WikiSearchEngine::log_and_return_js_error("Failed to create client", e))?;
 
-        log::info!("WikiSearchEngine created with index: {}", index_name);
+        log::info!(
+            "WikiSearchEngine created with base index: {}",
+            base_index_name
+        );
 
-        Ok(WikiSearchEngine { client, index_name })
+        Ok(WikiSearchEngine {
+            client,
+            base_index_name,
+        })
     }
 
     #[wasm_bindgen]
@@ -109,27 +113,71 @@ impl WikiSearchEngine {
 
     #[wasm_bindgen]
     pub async fn activated(&self) -> Result<(), JsValue> {
-        log::info!("Activating search engine");
+        use std::time::Duration;
+        use tokio::time::sleep;
 
-        self.client
-            .create_index(self.index_name.as_str(), Some("id"))
-            .await
-            .map_err(|e| {
-                WikiSearchEngine::log_and_return_js_error("Error creating index", e);
-            })
-            .expect("Error creating index")
-            .wait_for_completion(&self.client, None, None)
-            .await
-            .map_err(|e| {
-                WikiSearchEngine::log_and_return_js_error("Error creating index", e);
-            })
-            .expect("Error creating index");
-        let index = self.client.index(self.index_name.as_str());
+        log::info!("Activating search engine");
+        let index_name = &self.base_index_name;
+
+        // Check if index exists
+        let index_exists = match self.client.get_index(index_name).await {
+            Ok(_) => true,
+            Err(e) => {
+                let msg = format!("{}", e);
+                if msg.contains("index_not_found") {
+                    false
+                } else {
+                    return Err(WikiSearchEngine::log_and_return_js_error(
+                        "Error checking index existence",
+                        e,
+                    ));
+                }
+            }
+        };
+
+        if !index_exists {
+            self.client
+                .create_index(index_name, Some("id"))
+                .await
+                .map_err(|e| WikiSearchEngine::log_and_return_js_error("Error creating index", e))
+                .expect("Error creating index")
+                .wait_for_completion(&self.client, None, None)
+                .await
+                .map_err(|e| WikiSearchEngine::log_and_return_js_error("Error creating index", e))
+                .expect("Error creating index");
+        }
+
+        // Retry logic: poll for index readiness
+        let mut retries = 0;
+        let max_retries = 10;
+        let delay = Duration::from_millis(300);
+        loop {
+            let mut index = self.client.index(index_name);
+            match index.get_primary_key().await {
+                Ok(Some(_)) => {
+                    log::info!("Index {} is ready after {} retries", index_name, retries);
+                    break;
+                }
+                Ok(None) | Err(_) => {
+                    if retries >= max_retries {
+                        log::warn!("Index {} not ready after {} retries", index_name, retries);
+                        return Err(WikiSearchEngine::log_and_return_js_error(
+                            "Index not ready after retries",
+                            "unreachable",
+                        ));
+                    }
+                    retries += 1;
+                    sleep(delay).await;
+                }
+            }
+        }
+
+        let index = self.client.index(index_name);
         index
             .set_filterable_attributes(&["path", "hash", "id"])
             .await
             .map_err(|e| {
-                WikiSearchEngine::log_and_return_js_error("Error setting filterable attributes", e);
+                WikiSearchEngine::log_and_return_js_error("Error setting filterable attributes", e)
             })
             .expect("Error setting filterable attributes");
         Ok(())
@@ -138,11 +186,8 @@ impl WikiSearchEngine {
     #[wasm_bindgen]
     pub async fn suggest(&self, q: &str) -> Result<JsValue, JsValue> {
         log::info!("Suggesting query: {}", q);
-
         let results = self.execute_query(q).await?;
-
         log::info!("Suggestion results found: {}", results.hits.len());
-
         to_value(&PageSearchResponse::from(results))
             .map_err(|e| WikiSearchEngine::log_and_return_js_error("Error serializing results", e))
     }
@@ -150,11 +195,8 @@ impl WikiSearchEngine {
     #[wasm_bindgen]
     pub async fn query(&self, q: &str) -> Result<JsValue, JsValue> {
         log::info!("Querying: {}", q);
-
         let results = self.execute_query(q).await?;
-
         log::info!("Query results found: {}", results.hits.len());
-
         to_value(&PageSearchResponse::from(results)).map_err(|e| {
             WikiSearchEngine::log_and_return_js_error("Error serializing query results", e)
         })
@@ -176,7 +218,8 @@ impl WikiSearchEngine {
     pub async fn deleted(&self, page: &JsValue) -> Result<(), JsValue> {
         self.handle_document_operation(page, |page| async move {
             log::warn!("Deleting page: {}", page.id);
-            let index = self.client.index(&self.index_name);
+            let index_name = &self.base_index_name;
+            let index = self.client.index(index_name);
             let filter = format!("id = {}", page.id);
             let mut binding = DocumentDeletionQuery::new(&index);
             let query = binding.with_filter(&filter);

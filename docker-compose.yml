@@ -3,6 +3,7 @@ services:
     image: requarks/wiki:2
     container_name: wikijs
     restart: always
+    user: "${UID}:${GID}"
     ports:
       - "3000:3000"
     environment:
@@ -20,6 +21,7 @@ services:
     image: getmeili/meilisearch:v1.19
     container_name: meilisearch
     restart: always
+    user: "${UID}:${GID}"
     ports:
       - "7700:7700"
     environment:

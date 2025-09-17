@@ -56,7 +56,7 @@ jobs:
           cd pkg && zip -r ../meilisearch.zip ./*
 
       - name: Check for VERSION changes
-        if: github.ref == 'refs/heads/main'  # Ensure this is the default branch
+        if: github.ref == 'refs/heads/main' # Ensure this is the default branch
         id: check_version
         run: |
           VERSION=$(cat VERSION)

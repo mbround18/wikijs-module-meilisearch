@@ -51,7 +51,7 @@ let logger = WIKI.logger;
  */
 async function getSearchEngine({
   meilisearchHost,
-  meilisearchApiKey,
+  meilisearchMasterKey,
   indexName,
   timeout,
 }) {
@@ -62,12 +62,9 @@ async function getSearchEngine({
   }
 
   if (!searchEngine) {
-    logger.info(
-      `(SEARCH/MEILISEARCH) Configuring search engine with host: ${meilisearchHost}, index: ${indexName}`,
-    );
     searchEngine = await new wasm.WikiSearchEngine(
       meilisearchHost || "http://meilisearch:7700",
-      meilisearchApiKey || "demo",
+      meilisearchMasterKey || "demo",
       indexName || "wiki_index",
       BigInt(timeout || 5000),
     );
@@ -96,10 +93,9 @@ module.exports = {
   /**
    * ACTIVATE
    */
-  async activate() {
-    logger.info(`(SEARCH/MEILISEARCH) Activating search engine...`);
+  async activate(opts = {}) {
+    logger.log(`(SEARCH/MEILISEARCH) Activating search engine...`, opts);
     const engine = await getSearchEngine(this.config);
-    // log all methods attached to engine
     logger.info(`(SEARCH/MEILISEARCH) Engine methods: ${Object.keys(engine)}`);
     await engine.activated();
     logger.info(`(SEARCH/MEILISEARCH) Search engine activated.`);
@@ -151,31 +147,21 @@ module.exports = {
    *
    * @throws {Error} Throws an error if the query fails.
    */
-  async query(q, opts) {
+  async query(q, opts = {}, ...args) {
     try {
-      logger.info(
-        `(SEARCH/MEILISEARCH) Querying search engine with query: ${q}`,
-      );
       const engine = await getSearchEngine(this.config);
       const results = (await engine.query(q)) || [];
+      logger.info(`[DEBUG] Query results object:`, results);
       logger.info(
-        `(SEARCH/MEILISEARCH) Query returned ${results.length} results.`,
+        `(SEARCH/MEILISEARCH) Query returned ${results && results.results && Array.isArray(results.results) ? results.results.length : 0} results.`,
       );
-      // locale is required for search but nowhere else. So we need to map it to localCode
-      results.results = (results.results || []).map(
-        /**
-         *
-         * @param {WikiPage} s
-         * @returns {SearchResultsResponse}
-         */
-        (s) => {
-          let locale = s.localeCode;
+      results.results = (results.results || []).map((s) => {
+        if (s.localeCode) {
+          s.locale = s.localeCode;
           delete s.localeCode;
-          // Not being found here is expected.
-          s.locale = locale;
-          return s;
-        },
-      );
+        }
+        return s;
+      });
       return results;
     } catch (err) {
       logger.warn(
@@ -190,13 +176,13 @@ module.exports = {
    * @param {String} q Query
    * @param {Object} opts Additional options
    */
-  async suggest(q, opts) {
+  async suggest(q, opts = {}) {
+    logger.info(`[DEBUG] Suggest called with query: ${q} and opts:`, opts);
     try {
       logger.info(`(SEARCH/MEILISEARCH) Fetching suggestions for query: ${q}`);
       const engine = await getSearchEngine(this.config);
-      const suggestions = await engine.suggest(q, opts);
+      const suggestions = await engine.suggest(q);
       logger.info(`(SEARCH/MEILISEARCH) Suggestions fetched successfully.`);
-
       return suggestions;
     } catch (err) {
       logger.warn(
@@ -312,15 +298,13 @@ module.exports = {
       // Use a promise to handle the streaming process
       const processRow = async (row) => {
         row.id = row.realId;
-        console.log(
-          `Processing page with ID ${JSON.stringify(row, null, 2)}...`,
-        );
         try {
           // Perform delete operation
           await engine.deleted(row);
           // Perform create operation
-          await engine.created(row);
-          console.log(`Page with ID ${row.id} processed successfully.`);
+          const results = await engine.created(row);
+          if (logger.debug)
+            logger.debug(`[DEBUG] Results from engine.created:`, results);
         } catch (err) {
           console.error(`Error processing page with ID ${row.id}: ${err}`);
         }
