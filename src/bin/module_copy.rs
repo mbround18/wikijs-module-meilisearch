@@ -35,6 +35,9 @@ enum Commands {
         /// Replace existing destination contents before copy
         #[arg(long)]
         replace: bool,
+        /// Perform a dry run: log actions without modifying files
+        #[arg(long)]
+        dry_run: bool,
     },
 }
 
@@ -67,6 +70,19 @@ fn clear_destination(dst: &Path) -> io::Result<Vec<PathBuf>> {
     }
 }
 
+fn list_destination_entries(dst: &Path) -> io::Result<Vec<PathBuf>> {
+    if dst.exists() {
+        let mut entries = Vec::new();
+        for entry in fs::read_dir(dst)? {
+            let entry = entry?;
+            entries.push(entry.path());
+        }
+        Ok(entries)
+    } else {
+        Ok(Vec::new())
+    }
+}
+
 fn copy_recursive(src: &Path, dst: &Path) -> io::Result<Vec<PathBuf>> {
     if !src.is_dir() {
         return Err(io::Error::new(
@@ -91,6 +107,26 @@ fn copy_recursive(src: &Path, dst: &Path) -> io::Result<Vec<PathBuf>> {
     Ok(copied)
 }
 
+fn list_files_to_copy(src: &Path, dst: &Path) -> io::Result<Vec<PathBuf>> {
+    if !src.is_dir() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "Source must be directory",
+        ));
+    }
+    let mut copied = Vec::new();
+    for entry in WalkDir::new(src) {
+        let entry = entry?;
+        let path = entry.path();
+        let rel = path.strip_prefix(src).unwrap();
+        let dest_path = dst.join(rel);
+        if path.is_file() {
+            copied.push(dest_path);
+        }
+    }
+    Ok(copied)
+}
+
 fn read_version_file(dst: &Path) -> Option<String> {
     // Try both root and nested pkg VERSION placements
     let candidates = [dst.join("VERSION"), dst.join("pkg/VERSION")];
@@ -108,9 +144,46 @@ fn run_copy(
     source: Option<PathBuf>,
     destination: Option<PathBuf>,
     replace: bool,
+    dry_run: bool,
 ) -> io::Result<()> {
     let (src, dst) = resolve_paths(source, destination);
-    info!(?src, ?dst, replace, "Starting copy operation");
+    info!(?src, ?dst, replace, dry_run, "Starting copy operation");
+
+    if dry_run {
+        if replace {
+            let removed = list_destination_entries(&dst)?;
+            if removed.is_empty() {
+                debug!("DRY-RUN: No existing files to remove in destination");
+            } else {
+                for p in &removed {
+                    debug!(would_remove=?p);
+                }
+                info!(count = removed.len(), "DRY-RUN: Destination would be cleared");
+            }
+        }
+
+        let copied = list_files_to_copy(&src, &dst)?;
+        if copied.is_empty() {
+            warn!("DRY-RUN: No files would be copied; source may contain only directories");
+        }
+        for p in &copied {
+            debug!(would_copy=?p);
+        }
+        info!(count = copied.len(), "DRY-RUN: Files that would be copied");
+
+        if let Some(version) = read_version_file(&src) {
+            info!(version, "DRY-RUN: Discovered VERSION in source");
+        } else {
+            debug!("DRY-RUN: No VERSION file found in source");
+        }
+        if let Some(version) = read_version_file(&dst) {
+            info!(version, "DRY-RUN: Destination currently has VERSION");
+        } else {
+            warn!("DRY-RUN: Destination currently has no VERSION file");
+        }
+        return Ok(());
+    }
+
     if replace {
         let removed = clear_destination(&dst)?;
         if removed.is_empty() {
@@ -122,6 +195,7 @@ fn run_copy(
             info!(count = removed.len(), "Destination cleared");
         }
     }
+
     let copied = copy_recursive(&src, &dst)?;
     if copied.is_empty() {
         warn!("No files copied; source may have contained only directories");
@@ -147,14 +221,21 @@ fn run_copy(
 fn main() {
     // Initialize tracing subscriber once
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-    fmt().with_target(false).with_env_filter(filter).init();
+    fmt()
+        .with_target(false)
+        .with_env_filter(filter)
+        .without_time()
+        .with_ansi(false)
+        .with_writer(std::io::stdout)
+        .init();
     let cli = Cli::parse();
     let result = match cli.command {
         Commands::Copy {
             source,
             destination,
             replace,
-        } => run_copy(source, destination, replace),
+            dry_run,
+        } => run_copy(source, destination, replace, dry_run),
     };
     if let Err(e) = result {
         error!(error=%e, "Copy operation failed");
@@ -188,6 +269,7 @@ mod tests {
             Some(src_dir.path().to_path_buf()),
             Some(dst_dir.path().to_path_buf()),
             false,
+            false,
         )
         .unwrap();
 
@@ -214,10 +296,34 @@ mod tests {
             Some(src_dir.path().to_path_buf()),
             Some(dst_dir.path().to_path_buf()),
             true,
+            false,
         )
         .unwrap();
 
         assert!(!dst_dir.path().join("to-be-removed.txt").exists());
         assert!(dst_dir.path().join("only-in-src.txt").exists());
+    }
+
+    #[test]
+    fn dry_run_makes_no_changes() {
+        let src_dir = tempdir().unwrap();
+        let dst_dir = tempdir().unwrap();
+
+        // Pre-populate both sides
+        write_file(&src_dir.path().join("new/file.txt"), "content");
+        write_file(&dst_dir.path().join("old/file.txt"), "old");
+
+        // Run in dry-run with replace=true
+        run_copy(
+            Some(src_dir.path().to_path_buf()),
+            Some(dst_dir.path().to_path_buf()),
+            true,
+            true,
+        )
+        .unwrap();
+
+        // Destination should be unchanged
+        assert!(dst_dir.path().join("old/file.txt").exists());
+        assert!(!dst_dir.path().join("new/file.txt").exists());
     }
 }

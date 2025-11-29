@@ -32,7 +32,7 @@ services:
     links:
       - meilisearch
 
-  wikijs-meilisearch-module:
+  wikijs-meilisearch-module: &wikijs-meilisearch-module
     user: "${UID:-1000}:${GID:-1000}"
     build:
       context: .
@@ -49,6 +49,11 @@ services:
     command: ["copy", "--replace"]
     volumes:
       - wikijs-meilisearch-module:/modules/meilisearch:ro
+  
+  module-with-dry-run:
+    <<: *wikijs-meilisearch-module
+    container_name: wikijs-meilisearch-module-dry-run
+    command: ["copy", "--replace", "--dry-run"]
 
 volumes:
   wikijs-meilisearch-module:

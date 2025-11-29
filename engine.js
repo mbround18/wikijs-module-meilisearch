@@ -29,7 +29,7 @@
 /**
  * @type {wasm}
  */
-const wasm = require("./meilisearch.js");
+const wasm = require("./pkg/meilisearch.js");
 
 /**
  * @type {WikiSearchEngine}
