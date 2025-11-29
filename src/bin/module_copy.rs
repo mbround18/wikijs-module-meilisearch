@@ -156,8 +156,7 @@ fn check_permissions(path: &Path) -> io::Result<()> {
                 )),
             }
         } else {
-            Err(io::Error::new(
-                io::ErrorKind::Other,
+            Err(io::Error::other(
                 format!(
                     "Destination '{}' is a file, not a directory; expected a directory for Wiki.js modules.",
                     path.display()
@@ -191,11 +190,10 @@ fn read_version_file(dst: &Path) -> Option<String> {
     // Try both root and nested pkg VERSION placements
     let candidates = [dst.join("VERSION"), dst.join("pkg/VERSION")];
     for c in candidates {
-        if c.exists() {
-            if let Ok(contents) = fs::read_to_string(&c) {
+        if c.exists()
+            && let Ok(contents) = fs::read_to_string(&c) {
                 return Some(contents.trim().to_string());
             }
-        }
     }
     None
 }
