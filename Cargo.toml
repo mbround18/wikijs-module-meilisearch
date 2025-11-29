@@ -7,6 +7,11 @@ description = "A Meilisearch integration module for Wiki.js."
 repository = "https://github.com/mbround18/wikijs-module-meilisearch"
 license = "./LICENSE"
 
+[[bin]]
+name = "wiki_meilisearch"
+path = "src/bin/module_copy.rs"
+
+
 [lib]
 crate-type = ["cdylib"]
 name = "meilisearch"
@@ -14,12 +19,12 @@ path = "src/lib.rs"
 
 [dependencies]
 wasm-bindgen = "0.2.102"
-meilisearch-sdk = { version = "0.29.1", features = ["futures-unsend"] }
+meilisearch-sdk = { version = "0", features = ["futures-unsend"] }
 serde = { version = "1.0.225", features = ["derive"] }
 serde_json = "1.0.145"
 wasm-bindgen-futures = "0.4.52"
 serde-wasm-bindgen = "0.6.5"
-reqwest = { version = "0.12.23", features = ["json"] }
+reqwest = { version = "0.12.23", features = ["json", "rustls-tls"] }
 futures = "0.3.31"
 futures-io = "0.3.31"
 tokio = { version = "1.47.1", features = ["rt", "time", "macros"] }
@@ -29,9 +34,14 @@ log = "0.4.28"
 env_logger = "0.11.8"
 glob = "0.3.3"
 regex = "1.11.2"
+clap = { version = "4.5.20", features = ["derive"] }
+walkdir = "2.5.0"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.52"
+tempfile = "3.12.0"
 
 [target.wasm32-unknown-unknown.dependencies]
 web-sys = { version = "0.3.79", features = ["Window", "Request", "Response", "RequestInit", "RequestMode"] }

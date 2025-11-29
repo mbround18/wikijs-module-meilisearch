@@ -1,0 +1,55 @@
+services:
+  meilisearch:
+    image: getmeili/meilisearch:v1
+    container_name: meilisearch
+    restart: always
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: "demo"
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_LOG_LEVEL: "DEBUG"
+    volumes:
+      - ./tmp/meilisearch:/meili_data
+
+  wikijs:
+    user: "${UID:-1000}:${GID:-1000}"
+    image: requarks/wiki:2
+    container_name: wikijs
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_TYPE: sqlite
+    volumes:
+      - ./tmp/wikijs:/wiki/data:rw
+      - ./config/wiki.yml:/wiki/config.yml:r
+      - wikijs-meilisearch-module:/wiki/server/modules/meilisearch:ro
+    depends_on:
+      - meilisearch
+      - wikijs-meilisearch-module
+    links:
+      - meilisearch
+
+  wikijs-meilisearch-module:
+    user: "${UID:-1000}:${GID:-1000}"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+    image: mbround18/wikijs-meilisearch-module:${VERSION:-latest}
+    container_name: wikijs-meilisearch-module
+    restart: "no"
+    environment:
+      SOURCE: "/modules/meilisearch"
+      DESTINATION: "/wiki/server/modules/meilisearch"
+      RUST_LOG: "debug"
+    command: ["copy", "--replace"]
+    volumes:
+      - wikijs-meilisearch-module:/modules/meilisearch:ro
+
+volumes:
+  wikijs-meilisearch-module:
+

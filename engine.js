@@ -55,6 +55,24 @@ async function getSearchEngine({
   indexName,
   timeout,
 }) {
+  // Allow overriding init options via environment variables when process is defined
+  const resolveConfig = (cfg) => {
+    try {
+      if (typeof process !== 'undefined' && process && process.env) {
+        const env = process.env;
+        return {
+          meilisearchHost: env.MEILISEARCH_HOST || cfg.meilisearchHost,
+          meilisearchMasterKey: env.MEILISEARCH_MASTER_KEY || cfg.meilisearchMasterKey,
+          indexName: env.MEILISEARCH_INDEX_NAME || cfg.indexName,
+          timeout: env.MEILISEARCH_TIMEOUT ? Number(env.MEILISEARCH_TIMEOUT) : cfg.timeout,
+        };
+      }
+    } catch (_) {}
+    return cfg;
+  };
+
+  const resolved = resolveConfig({ meilisearchHost, meilisearchMasterKey, indexName, timeout });
+
   if (!wasm.WikiSearchEngine) {
     throw new Error(
       `(SEARCH/MEILISEARCH) WikiSearchEngine is not defined. Make sure to add the search engine to your dependencies.`,
@@ -62,11 +80,15 @@ async function getSearchEngine({
   }
 
   if (!searchEngine) {
+    const safeKey = (resolved.meilisearchMasterKey || '').replace(/.(?=.{4})/g, '*');
+    logger.info(
+      `(SEARCH/MEILISEARCH) Initializing engine with host=${resolved.meilisearchHost || 'http://meilisearch:7700'}, index=${resolved.indexName || 'wiki_index'}, timeout=${resolved.timeout || 5000}, key=${safeKey}`,
+    );
     searchEngine = await new wasm.WikiSearchEngine(
-      meilisearchHost || "http://meilisearch:7700",
-      meilisearchMasterKey || "demo",
-      indexName || "wiki_index",
-      BigInt(timeout || 5000),
+      resolved.meilisearchHost || "http://meilisearch:7700",
+      resolved.meilisearchMasterKey || "demo",
+      resolved.indexName || "wiki_index",
+      BigInt(resolved.timeout || 5000),
     );
   }
 
