@@ -2,7 +2,7 @@
 PROJECT_NAME := wiki_meilisearch
 DOCKER_COMPOSE := compose.yml
 PKG_DIR := pkg
-SOURCE_FILES := engine.js definition.yml
+SOURCE_FILES := engine.js definition.yml LICENSE README.md
 # VERSION fallback: use env VERSION else derive from git short sha as sha-<short>
 GIT_SHA := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
 VERSION ?= sha-$(GIT_SHA)
@@ -38,6 +38,7 @@ build: clean ## Build the project
 	@mkdir -p $(PKG_DIR)
 	@cp $(SOURCE_FILES) $(PKG_DIR)
 	@echo "Building wasm-pack..."
+	@echo "$(VERSION)" > $(PKG_DIR)/VERSION
 	@wasm-pack build --target nodejs
 
 

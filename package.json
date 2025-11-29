@@ -1,0 +1,34 @@
+{
+  "name": "wikijs-module-meilisearch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:wasm": "wasm-pack build --release --target nodejs --out-dir ./pkg",
+    "build:js": "rspack build",
+    "build": "pnpm run build:wasm && pnpm run build:js",
+    "test": "echo \"No tests\"",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rspack/core": "1.6.5",
+    "@rspack/cli": "1.6.5",
+    "prettier": "^2.8.8"
+  },
+  "packageManager": "pnpm@10.19.0",
+  "pnpm": {
+    "overrides": {
+      "@rspack/core": "1.6.5",
+      "@rspack/cli": "1.6.5"
+    },
+    "peerDependencyRules": {
+      "allowAny": [
+        "@rspack/*"
+      ]
+    }
+  }
+}

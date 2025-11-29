@@ -1,13 +1,17 @@
- # syntax=docker/dockerfile:1.7
- # Optimized multi-stage build for Wiki.js Meilisearch module delivery.
- # Uses cargo-chef + sccache + BuildKit cache mounts for fast incremental rebuilds.
+# syntax=docker/dockerfile:1.7
+# Optimized multi-stage build for Wiki.js Meilisearch module delivery.
+
+ARG VERSION=dev
+ARG RUST_IMAGE=rust:1.91-bookworm
+ARG NODE_IMAGE=node:24-slim
+ARG WASM_TARGET=nodejs
+ARG PNPM_VERSION=10.19.0
 
 ########################
 # 1) Base toolchain
 ########################
-FROM rust:1.91-bookworm AS rust-base
+FROM ${RUST_IMAGE} AS rust-base
 
-ARG VERSION=dev
 ENV VERSION=$VERSION \
     CARGO_TERM_COLOR=always \
     CARGO_HOME=/usr/local/cargo \
@@ -49,49 +53,65 @@ FROM rust-base AS builder
 WORKDIR /app
 COPY . .
 
-ARG VERSION=dev
 ENV VERSION=$VERSION 
 
 # Reuse dependency artifacts
 COPY --from=deps /app/target /app/target
 COPY --from=deps /usr/local/cargo /usr/local/cargo
 
-# Build wasm package (bundler target) and the delivery binary with caching
+# Build wasm package and the delivery binary with caching
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/app/target \
-    # Unset RUSTFLAGS for wasm build (rust-lld rejects -fuse-ld=mold) then restore for native build
-    RUSTFLAGS="" wasm-pack build --release --target bundler --out-dir pkg && \
+    # Unset RUSTFLAGS for wasm build (rust-lld rejects -fuse-ld=mold)
+    RUSTFLAGS="" wasm-pack build --release --out-dir pkg && \
     echo "$VERSION" > VERSION && \
     cargo build --release --locked --bin wiki_meilisearch
+
+FROM ${NODE_IMAGE} AS node-base
+
+
+WORKDIR /app
+
+COPY ./package.json ./
+COPY ./pnpm-lock.yaml ./
+
+ENV NODE_ENV=production
+RUN apt-get update -y && apt-get upgrade -y && rm -rf /var/lib/apt/lists/* && \
+    corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+
+# Install JS deps with cache for pnpm store
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile --prefer-offline
+
+COPY . .
+COPY --from=builder /app/pkg ./pkg
+
+# Build the JS bundle with VERSION propagated for dist/VERSION
+RUN VERSION=$VERSION pnpm run build:js
+
 
 ########################
 # 5) Minimal runtime image (glibc)
 ########################
 FROM gcr.io/distroless/cc-debian13:nonroot AS runtime
+ARG VERSION=dev
+LABEL org.opencontainers.image.title="Wiki.js Meilisearch Module" \
+    org.opencontainers.image.description="WASM-powered Meilisearch module for Wiki.js" \
+    org.opencontainers.image.version=$VERSION \
+    org.opencontainers.image.source="https://github.com/mbround18/wikijs-module-meilisearch"
 WORKDIR /
 
 # Default locations inside the container for copy tool
 ENV SOURCE=/modules/meilisearch \
     DESTINATION=/wiki/server/modules/meilisearch
 
-# Module assets
-COPY --from=builder /app/pkg /modules/meilisearch/pkg
-COPY --from=builder /app/engine.js /modules/meilisearch/engine.js
-COPY --from=builder /app/definition.yml /modules/meilisearch/definition.yml
-COPY --from=builder /app/README.md /modules/meilisearch/README.md
-COPY --from=builder /app/LICENSE /modules/meilisearch/LICENSE
-COPY --from=builder /app/VERSION /modules/meilisearch/VERSION
+# Module assets (bundled engine + pkg + metadata)
+COPY --from=node-base /app/dist /modules/meilisearch
 COPY --from=builder /app/target/release/wiki_meilisearch /wiki_meilisearch
-# Optional logo (ignore if absent)
-COPY --from=builder /app/docs/assets/logo.png /modules/meilisearch/docs/assets/logo.png
+COPY ./docs/assets/logo.png /modules/meilisearch/docs/assets/logo.png
 
 USER nonroot
 ENTRYPOINT ["/wiki_meilisearch"]
 CMD ["copy"]
 
-# ---- Notes ----
-# For even smaller runtime, consider switching reqwest to rustls and building a MUSL target, then
-#   FROM gcr.io/distroless/static:nonroot
-#   (Requires: rustup target add x86_64-unknown-linux-musl and dependencies adjusted.)
-# Enable BuildKit for best performance: DOCKER_BUILDKIT=1 docker build .

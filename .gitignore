@@ -1,5 +1,7 @@
 tmp/
 doc.txt
+node_modules/
+dist/
 
 # Created by https://www.toptal.com/developers/gitignore/api/rust,intellij,visualstudiocode,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=rust,intellij,visualstudiocode,python

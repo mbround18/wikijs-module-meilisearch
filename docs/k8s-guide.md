@@ -3,6 +3,7 @@
 This guide explains how to deploy Wiki.js, Meilisearch, and the Meilisearch search module on Kubernetes using best practices for modularity and security.
 
 ## Prerequisites
+
 - A running Kubernetes cluster
 - `kubectl` access
 - Persistent storage provisioner (for Wiki.js and Meilisearch data)
@@ -10,6 +11,7 @@ This guide explains how to deploy Wiki.js, Meilisearch, and the Meilisearch sear
 ---
 
 ## 1. Persistent Volume Claims
+
 Define PVCs for Wiki.js data and Meilisearch data, and for the Meilisearch module (optional, for upgrades):
 
 ```yaml
@@ -169,6 +171,7 @@ spec:
 ---
 
 ## 5. Security & Best Practices
+
 - Use a restricted Meilisearch API key for Wiki.js (see README for details)
 - Use persistent storage for all data
 - Use resource requests/limits for production

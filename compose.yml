@@ -49,7 +49,7 @@ services:
     command: ["copy", "--replace"]
     volumes:
       - wikijs-meilisearch-module:/modules/meilisearch:ro
-  
+
   module-with-dry-run:
     <<: *wikijs-meilisearch-module
     container_name: wikijs-meilisearch-module-dry-run
@@ -57,4 +57,3 @@ services:
 
 volumes:
   wikijs-meilisearch-module:
-
