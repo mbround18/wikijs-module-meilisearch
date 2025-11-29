@@ -22,13 +22,6 @@ echo "Source:      $SRC"
 echo "Destination: $DST"
 echo "=============================================="
 
-CMD_ARGS="${*:-}"
-if [ -z "$CMD_ARGS" ]; then
-	CMD_ARGS="copy"
-fi
-
 export RUST_LOG="${RUST_LOG:-info}"
 
-
-echo "Executing: /wiki_meilisearch $CMD_ARGS"
-exec /wiki_meilisearch $CMD_ARGS
+exec /wiki_meilisearch "$@" 2>&1 | sed 's/^/[wiki-meili-copy] /' 
