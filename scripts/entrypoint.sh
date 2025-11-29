@@ -26,6 +26,8 @@ export RUST_LOG="${RUST_LOG:-info}"
 
 # shell delete dest contents and copy in source to dest
 rm -rf "${DST:?}/"* || true
-mkdir -p "$DST"
+mkdir -p "$DST" || true
 cp -r "$SRC/"* "$DST/"
 
+echo "Module assets copied successfully."
+echo ""
