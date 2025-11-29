@@ -24,4 +24,7 @@ echo "=============================================="
 
 export RUST_LOG="${RUST_LOG:-info}"
 
-exec /wiki_meilisearch "$@" 2>&1 | sed 's/^/[wiki-meili-copy] /' 
+# shell delete dest contents and copy in source to dest
+rm -rf "${DST:?}/"*
+cp -r "$SRC/"* "$DST/"
+

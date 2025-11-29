@@ -7,11 +7,6 @@ description = "A Meilisearch integration module for Wiki.js."
 repository = "https://github.com/mbround18/wikijs-module-meilisearch"
 license = "./LICENSE"
 
-[[bin]]
-name = "wiki_meilisearch"
-path = "src/bin/module_copy.rs"
-
-
 [lib]
 crate-type = ["cdylib"]
 name = "meilisearch"
