@@ -27,5 +27,8 @@ if [ -z "$CMD_ARGS" ]; then
 	CMD_ARGS="copy"
 fi
 
+export RUST_LOG="${RUST_LOG:-info}"
+
+
 echo "Executing: /wiki_meilisearch $CMD_ARGS"
 exec /wiki_meilisearch $CMD_ARGS

@@ -106,7 +106,7 @@ ENV SOURCE=/modules/meilisearch \
 
 # Module assets (bundled engine + pkg + metadata)
 COPY --from=node-base /app/dist /modules/meilisearch
-COPY --from=builder /app/target/release/wiki_meilisearch /wiki_meilisearch
+COPY --from=builder --chmod=0755 /app/target/release/wiki_meilisearch /wiki_meilisearch
 COPY ./docs/assets/logo.png /modules/meilisearch/docs/assets/logo.png
 
 # Nice entrypoint banner + command passthrough
