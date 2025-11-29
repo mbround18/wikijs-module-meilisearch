@@ -107,6 +107,66 @@ fn copy_recursive(src: &Path, dst: &Path) -> io::Result<Vec<PathBuf>> {
     Ok(copied)
 }
 
+fn check_permissions(path: &Path) -> io::Result<()> {
+    // Best-effort, human-friendly permission check. We don't try to be POSIX-perfect,
+    // just detect obviously unwritable paths early and explain what to look at.
+    if !path.exists() {
+        let parent = path.parent().unwrap_or_else(|| Path::new("/"));
+        if !parent.exists() {
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                format!(
+                    "Destination parent directory '{}' does not exist; ensure the Wiki.js volume is mounted correctly",
+                    parent.display()
+                ),
+            ));
+        }
+        // Parent exists; try creating and deleting a temp directory as a canary.
+        let probe = parent.join(".meili-copy-permission-check");
+        match fs::create_dir(&probe) {
+            Ok(()) => {
+                let _ = fs::remove_dir(&probe);
+                Ok(())
+            }
+            Err(e) => Err(io::Error::new(
+                e.kind(),
+                format!(
+                    "Unable to create content under '{}': {}. This usually means the container user does not have write permissions to the Wiki.js modules volume.",
+                    parent.display(),
+                    e
+                ),
+            )),
+        }
+    } else {
+        // Path exists; try creating a tiny temp file.
+        if path.is_dir() {
+            let probe = path.join(".meili-copy-permission-check");
+            match fs::File::create(&probe) {
+                Ok(_) => {
+                    let _ = fs::remove_file(&probe);
+                    Ok(())
+                }
+                Err(e) => Err(io::Error::new(
+                    e.kind(),
+                    format!(
+                        "Destination '{}' is not writable: {}. Check volume mount options and container user permissions.",
+                        path.display(),
+                        e
+                    ),
+                )),
+            }
+        } else {
+            Err(io::Error::new(
+                io::ErrorKind::Other,
+                format!(
+                    "Destination '{}' is a file, not a directory; expected a directory for Wiki.js modules.",
+                    path.display()
+                ),
+            ))
+        }
+    }
+}
+
 fn list_files_to_copy(src: &Path, dst: &Path) -> io::Result<Vec<PathBuf>> {
     if !src.is_dir() {
         return Err(io::Error::new(
@@ -147,7 +207,28 @@ fn run_copy(
     dry_run: bool,
 ) -> io::Result<()> {
     let (src, dst) = resolve_paths(source, destination);
-    info!(?src, ?dst, replace, dry_run, "Starting copy operation");
+    info!("Starting Wiki.js Meilisearch module copy run...");
+    info!(
+        source = %src.display(),
+        destination = %dst.display(),
+        replace,
+        dry_run,
+        "Resolved paths and options"
+    );
+
+    if !src.exists() {
+        warn!("Source directory does not exist; nothing can be copied");
+    } else if !src.is_dir() {
+        warn!("Source path exists but is not a directory; copy will fail");
+    } else {
+        debug!("Source directory is present and readable");
+    }
+
+    if dst.exists() {
+        debug!("Destination directory already exists; contents may be replaced or reused");
+    } else {
+        debug!("Destination directory does not exist yet; it will be created as needed");
+    }
 
     if dry_run {
         if replace {
@@ -158,13 +239,18 @@ fn run_copy(
                 for p in &removed {
                     debug!(would_remove=?p);
                 }
-                info!(count = removed.len(), "DRY-RUN: Destination would be cleared");
+                info!(
+                    count = removed.len(),
+                    "DRY-RUN: Destination would be cleared"
+                );
             }
         }
 
         let copied = list_files_to_copy(&src, &dst)?;
         if copied.is_empty() {
-            warn!("DRY-RUN: No files would be copied; source may contain only directories");
+            warn!(
+                "DRY-RUN: No files would be copied; source may contain only directories or is empty"
+            );
         }
         for p in &copied {
             debug!(would_copy=?p);
@@ -181,24 +267,33 @@ fn run_copy(
         } else {
             warn!("DRY-RUN: Destination currently has no VERSION file");
         }
+        info!("DRY-RUN: Copy simulation completed; no changes were made");
         return Ok(());
+    }
+
+    if let Err(e) = check_permissions(&dst) {
+        warn!(
+            error = %e,
+            "Destination does not look writable; aborting before attempting to copy."
+        );
+        return Err(e);
     }
 
     if replace {
         let removed = clear_destination(&dst)?;
         if removed.is_empty() {
-            debug!("No existing files to remove in destination");
+            info!("Destination was already empty; nothing to clear before copy");
         } else {
             for p in &removed {
                 debug!(removed=?p);
             }
-            info!(count = removed.len(), "Destination cleared");
+            info!(count = removed.len(), "Destination cleared before copy");
         }
     }
 
     let copied = copy_recursive(&src, &dst)?;
     if copied.is_empty() {
-        warn!("No files copied; source may have contained only directories");
+        warn!("No files were copied; source may have contained only directories or was empty");
     }
     for p in &copied {
         debug!(copied=?p);
@@ -215,11 +310,12 @@ fn run_copy(
     } else {
         warn!("No VERSION file found in destination after copy");
     }
+    info!("Copy run completed successfully");
     Ok(())
 }
 
 fn main() {
-    // Initialize tracing subscriber once
+    // Initialize tracing subscriber once. Default to info-level logs unless RUST_LOG overrides it.
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     fmt()
         .with_target(false)
@@ -239,7 +335,10 @@ fn main() {
     };
     if let Err(e) = result {
         error!(error=%e, "Copy operation failed");
-        let _ = writeln!(io::stderr(), "Error: {e}");
+        let _ = writeln!(
+            io::stderr(),
+            "Wiki.js Meilisearch module copy failed: {e}.\n  Hints: check SOURCE and DESTINATION paths, filesystem permissions, and that the source directory actually contains module files.",
+        );
         std::process::exit(1);
     }
 }
