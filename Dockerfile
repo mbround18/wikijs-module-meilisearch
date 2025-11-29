@@ -4,7 +4,6 @@
 ARG VERSION=dev
 ARG RUST_IMAGE=rust:1.91-bookworm
 ARG NODE_IMAGE=node:24-slim
-ARG WASM_TARGET=nodejs
 ARG PNPM_VERSION=10.19.0
 
 ########################
@@ -63,7 +62,6 @@ COPY --from=deps /usr/local/cargo /usr/local/cargo
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/app/target \
-    # Unset RUSTFLAGS for wasm build (rust-lld rejects -fuse-ld=mold)
     RUSTFLAGS="" wasm-pack build --release --out-dir pkg && \
     echo "$VERSION" > VERSION && \
     cargo build --release --locked --bin wiki_meilisearch
@@ -94,7 +92,7 @@ RUN VERSION=$VERSION pnpm run build:js
 ########################
 # 5) Minimal runtime image (glibc)
 ########################
-FROM gcr.io/distroless/cc-debian13:nonroot AS runtime
+FROM debian:bookworm-slim AS runtime
 ARG VERSION=dev
 LABEL org.opencontainers.image.title="Wiki.js Meilisearch Module" \
     org.opencontainers.image.description="WASM-powered Meilisearch module for Wiki.js" \
@@ -111,7 +109,10 @@ COPY --from=node-base /app/dist /modules/meilisearch
 COPY --from=builder /app/target/release/wiki_meilisearch /wiki_meilisearch
 COPY ./docs/assets/logo.png /modules/meilisearch/docs/assets/logo.png
 
-USER nonroot
-ENTRYPOINT ["/wiki_meilisearch"]
+# Nice entrypoint banner + command passthrough
+COPY ./scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh && useradd -m -u 10001 appuser
+USER appuser
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["copy"]
 
