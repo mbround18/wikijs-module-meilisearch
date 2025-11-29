@@ -63,8 +63,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/app/target \
     RUSTFLAGS="" wasm-pack build --release --out-dir pkg && \
-    echo "$VERSION" > VERSION && \
-    cargo build --release --locked --bin wiki_meilisearch
+    echo "$VERSION" > VERSION
 
 FROM ${NODE_IMAGE} AS node-base
 
@@ -106,7 +105,6 @@ ENV SOURCE=/modules/meilisearch \
 
 # Module assets (bundled engine + pkg + metadata)
 COPY --from=node-base /app/dist /modules/meilisearch
-COPY --from=builder --chmod=0755 /app/target/release/wiki_meilisearch /wiki_meilisearch
 COPY ./docs/assets/logo.png /modules/meilisearch/docs/assets/logo.png
 
 # Nice entrypoint banner + command passthrough

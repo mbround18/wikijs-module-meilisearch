@@ -25,6 +25,7 @@ echo "=============================================="
 export RUST_LOG="${RUST_LOG:-info}"
 
 # shell delete dest contents and copy in source to dest
-rm -rf "${DST:?}/"*
+rm -rf "${DST:?}/"* || true
+mkdir -p "$DST"
 cp -r "$SRC/"* "$DST/"
 
