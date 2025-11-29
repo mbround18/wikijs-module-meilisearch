@@ -111,7 +111,8 @@ COPY ./docs/assets/logo.png /modules/meilisearch/docs/assets/logo.png
 
 # Nice entrypoint banner + command passthrough
 COPY ./scripts/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh && useradd -m -u 10001 appuser
+RUN chmod +x /entrypoint.sh && useradd -m -u 10001 appuser \
+    && echo "${VERSION}" > /modules/meilisearch/VERSION
 USER appuser
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["copy"]

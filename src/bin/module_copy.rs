@@ -313,6 +313,10 @@ fn run_copy(
 }
 
 fn main() {
+    // A couple of plain printlns to guarantee visibility even if tracing output
+    // is filtered or formatted away by the runtime environment.
+    println!("[wiki-meili-copy] Starting copy helper binary...");
+
     // Initialize tracing subscriber once. Default to info-level logs unless RUST_LOG overrides it.
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     fmt()
@@ -339,6 +343,7 @@ fn main() {
         );
         std::process::exit(1);
     }
+    println!("[wiki-meili-copy] Copy helper finished successfully.");
 }
 
 #[cfg(test)]
