@@ -1,8 +1,9 @@
 #!/usr/bin/env sh
 set -eu
-{
-	echo ""
-} * 5
+echo ""
+echo ""
+echo ""
+echo ""
 
 NOW="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 HOSTNAME_VAL="${HOSTNAME:-unknown}"
