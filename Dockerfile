@@ -17,7 +17,7 @@ ENV VERSION=$VERSION \
     RUSTFLAGS="-C debuginfo=0 -C link-arg=-fuse-ld=mold"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      pkg-config libssl-dev ca-certificates clang mold curl nodejs npm && \
+    pkg-config libssl-dev ca-certificates clang mold curl nodejs npm && \
     rm -rf /var/lib/apt/lists/*
 
 # Ensure wasm target is available up front (avoids rustup network during builds)
@@ -113,5 +113,3 @@ RUN chmod +x /entrypoint.sh && useradd -m -u 10001 appuser \
     && echo "${VERSION}" > /modules/meilisearch/VERSION
 USER appuser
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["copy"]
-
