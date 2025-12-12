@@ -65,7 +65,7 @@ compose-build: ## Build images with VERSION (fallback sha-<short>)
 	@echo "Building with VERSION=$(VERSION)"
 	@VERSION=$(VERSION) docker compose -f $(DOCKER_COMPOSE) build
 
-compose-push: ## Push images with VERSION tag
+compose-push: compose-build ## Push images with VERSION tag
 	@echo "Pushing with VERSION=$(VERSION)"
 	@VERSION=$(VERSION) docker compose -f $(DOCKER_COMPOSE) push
 
