@@ -101,7 +101,7 @@ WORKDIR /
 
 # Default locations inside the container for copy tool
 ENV SOURCE=/modules/meilisearch \
-    DESTINATION=/wiki/server/modules/meilisearch
+    DESTINATION=/wiki/server/modules/search/meilisearch
 
 # Module assets (bundled engine + pkg + metadata)
 COPY --from=node-base /app/dist /modules/meilisearch
