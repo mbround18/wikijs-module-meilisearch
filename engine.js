@@ -39,7 +39,7 @@ let searchEngine;
 /**
  * @type {Console}
  */
-let logger = WIKI.logger;
+let logger = WIKI?.logger || console;
 
 /**
  *
