@@ -42,7 +42,7 @@ export default defineConfig({
       targets: [
         { src: "definition.yml", dest: "." },
         { src: "LICENSE", dest: "." },
-        { src: "pkg/*.wasm", dest: "./pkg" },
+        { src: "pkg", dest: "." },
       ],
     }),
     {
