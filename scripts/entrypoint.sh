@@ -34,4 +34,7 @@ mkdir -p "$DST" || true
 cp -r "$SRC/"* "$DST/"
 
 echo "Module assets copied successfully."
+
+cd "$DST"
+tree .
 echo ""

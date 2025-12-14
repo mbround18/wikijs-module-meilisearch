@@ -99,6 +99,9 @@ LABEL org.opencontainers.image.title="Wiki.js Meilisearch Module" \
     org.opencontainers.image.source="https://github.com/mbround18/wikijs-module-meilisearch"
 WORKDIR /
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tree && rm -rf /var/lib/apt/lists/*
+
 # Default locations inside the container for copy tool
 ENV SOURCE=/modules/meilisearch \
     DESTINATION=/wiki/server/modules/search/meilisearch

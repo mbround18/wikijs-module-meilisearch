@@ -69,4 +69,12 @@ compose-push: compose-build ## Push images with VERSION tag
 	@echo "Pushing with VERSION=$(VERSION)"
 	@VERSION=$(VERSION) docker compose -f $(DOCKER_COMPOSE) push
 
+docker-test: compose-build ## Run tests inside a Docker container
+	@echo "Running tests in Docker..."
+	@mkdir -p tmp/out
+	@VERSION=$(VERSION) docker run --rm -it \
+		-u "$(shell id -u):$(shell id -g)" \
+		-v "$$PWD/tmp/out":/wiki/server/modules/search/meilisearch \
+		mbround18/wikijs-meilisearch-module:$(VERSION) 
+
 .PHONY: help setup build dev lint clean stop

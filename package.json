@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build:wasm": "wasm-pack build --release --target nodejs --out-dir ./pkg",
-    "build:js": "rspack build",
+    "build:js": "vite build",
     "build": "pnpm run build:wasm && pnpm run build:js",
     "test": "echo \"No tests\"",
     "lint": "prettier --check .",
@@ -17,7 +17,9 @@
   "devDependencies": {
     "@rspack/core": "1.6.5",
     "@rspack/cli": "1.6.5",
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "vite": "7.2.7",
+    "vite-plugin-static-copy": "3.1.4"
   },
   "packageManager": "pnpm@10.19.0",
   "pnpm": {
