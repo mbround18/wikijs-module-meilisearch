@@ -37,4 +37,5 @@ echo "Module assets copied successfully."
 
 cd "$DST"
 tree .
+cat ./pkg/meilisearch.js
 echo ""
