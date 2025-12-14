@@ -26,7 +26,7 @@ export default defineConfig({
       fileName: () => "engine.js",
     },
     rollupOptions: {
-      external: [], // Bundle all dependencies
+      external: ["./pkg/meilisearch"], // Bundle all dependencies
       output: {
         entryFileNames: "engine.js",
         assetFileNames: "[name][extname]",
