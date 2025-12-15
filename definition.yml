@@ -6,7 +6,7 @@ logo: https://cdn.jsdelivr.net/gh/mbround18/wikijs-module-meilisearch/docs/asset
 website: https://github.com/mbround18/wikijs-module-meilisearch
 props:
   meilisearchHost:
-    title: 'Meilisearch: Host'
+    title: "Meilisearch: Host"
     type: String
     hint: "The URL or IP address where the Meilisearch server is hosted."
     default: "http://meilisearch:7700"
@@ -21,7 +21,7 @@ props:
     placeholder: "Enter your Meilisearch master key"
     default: "demo"
   indexName:
-    title: 'Meilisearch: Index Name'
+    title: "Meilisearch: Index Name"
     type: String
     hint: "The name for the Meilisearch index. All documents will be stored in this single index."
     default: "wiki_index"

@@ -1,0 +1,21 @@
+name: Setup Node
+description: Composite action to set up a Node.js environment with pnpm
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js with pnpm
+      uses: actions/setup-node@v4
+      with:
+        node-version: "lts/*"
+        cache: "pnpm"
+
+    - name: Enable pnpm via corepack
+      shell: bash
+      run: |
+        corepack enable
+        corepack prepare pnpm@latest --activate
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile

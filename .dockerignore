@@ -1,2 +1,5 @@
 target
 tmp/
+pkg/
+dist/
+node_modules/

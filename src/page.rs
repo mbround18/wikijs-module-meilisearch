@@ -58,3 +58,40 @@ pub(crate) struct RenamedWikiPage {
     destination_locale_code: String,
     destination_hash: String,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn conversion_maps_destination_fields() {
+        let value = json!({
+            "id": 10,
+            "path": "/old/path",
+            "hash": "oldhash",
+            "title": "My Title",
+            "description": "Desc",
+            "content": "Some content here",
+            "contentType": "markdown",
+            "createdAt": "2020-01-01T00:00:00Z",
+            "updatedAt": "2020-01-02T00:00:00Z",
+            "editorKey": "editor",
+            "localeCode": "en",
+            "authorId": 2,
+            "creatorId": 3,
+            "destinationPath": "/new/path",
+            "destinationLocaleCode": "en",
+            "destinationHash": "newhash"
+        });
+        let renamed: RenamedWikiPage = serde_json::from_value(value).expect("valid renamed page");
+        let wiki: WikiPage = renamed.into();
+
+        assert_eq!(wiki.path, "/new/path");
+        assert_eq!(wiki.hash, "newhash");
+        // id should carry over unchanged
+        assert_eq!(wiki.id, 10);
+        // content retained
+        assert_eq!(wiki.content, "Some content here");
+    }
+}

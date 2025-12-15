@@ -1,8 +1,11 @@
 # Variables
 PROJECT_NAME := wiki_meilisearch
-DOCKER_COMPOSE := docker-compose.yml
+DOCKER_COMPOSE := compose.yml
 PKG_DIR := pkg
-SOURCE_FILES := engine.js definition.yml
+SOURCE_FILES := engine.js definition.yml LICENSE README.md
+# VERSION fallback: use env VERSION else derive from git short sha as sha-<short>
+GIT_SHA := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
+VERSION ?= sha-$(GIT_SHA)
 
 # Default target (help)
 .DEFAULT_GOAL := help
@@ -35,12 +38,13 @@ build: clean ## Build the project
 	@mkdir -p $(PKG_DIR)
 	@cp $(SOURCE_FILES) $(PKG_DIR)
 	@echo "Building wasm-pack..."
+	@echo "$(VERSION)" > $(PKG_DIR)/VERSION
 	@wasm-pack build --target nodejs
 
 
 dev: build ## Build the project and start development environment
 	@echo "Starting Docker Compose..."
-	@docker compose -f $(DOCKER_COMPOSE) up --remove-orphans
+	@VERSION=$(VERSION) docker compose -f $(DOCKER_COMPOSE) up --remove-orphans --build
 
 lint: ## Run linters on the Rust code
 	@echo "Running linters..."
@@ -56,5 +60,21 @@ clean: ## Clean up the project
 stop: ## Stop running Docker containers
 	@echo "Stopping Docker Compose..."
 	@docker compose -f $(DOCKER_COMPOSE) down
+
+compose-build: ## Build images with VERSION (fallback sha-<short>)
+	@echo "Building with VERSION=$(VERSION)"
+	@VERSION=$(VERSION) docker compose -f $(DOCKER_COMPOSE) build
+
+compose-push: compose-build ## Push images with VERSION tag
+	@echo "Pushing with VERSION=$(VERSION)"
+	@VERSION=$(VERSION) docker compose -f $(DOCKER_COMPOSE) push
+
+docker-test: compose-build ## Run tests inside a Docker container
+	@echo "Running tests in Docker..."
+	@mkdir -p tmp/out
+	@VERSION=$(VERSION) docker run --rm -it \
+		-u "$(shell id -u):$(shell id -g)" \
+		-v "$$PWD/tmp/out":/wiki/server/modules/search/meilisearch \
+		mbround18/wikijs-meilisearch-module:$(VERSION) 
 
 .PHONY: help setup build dev lint clean stop
