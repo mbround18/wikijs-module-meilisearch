@@ -83,27 +83,27 @@ async function getSearchEngine({
 
   if (!wasm.WikiSearchEngine) {
     throw new Error(
-      `(SEARCH/MEILISEARCH) WikiSearchEngine is not defined. Make sure to add the search engine to your dependencies.`
+      `(SEARCH/MEILISEARCH) WikiSearchEngine is not defined. Make sure to add the search engine to your dependencies.`,
     );
   }
 
   if (!searchEngine) {
     const safeKey = (resolved.meilisearchMasterKey || "").replace(
       /.(?=.{4})/g,
-      "*"
+      "*",
     );
     logger.info(
       `(SEARCH/MEILISEARCH) Initializing engine with host=${
         resolved.meilisearchHost || "http://meilisearch:7700"
       }, index=${resolved.indexName || "wiki_index"}, timeout=${
         resolved.timeout || 5000
-      }, key=${safeKey}`
+      }, key=${safeKey}`,
     );
     searchEngine = await new wasm.WikiSearchEngine(
       resolved.meilisearchHost || "http://meilisearch:7700",
       resolved.meilisearchMasterKey || "demo",
       resolved.indexName || "wiki_index",
-      BigInt(resolved.timeout || 5000)
+      BigInt(resolved.timeout || 5000),
     );
   }
 
@@ -113,12 +113,12 @@ async function getSearchEngine({
 function rejectIfIsPrivateAndNotPublished(page, action) {
   if (!page.isPublished) {
     logger.warn(
-      `(SEARCH/MEILISEARCH) SKIPPING: Page with path ${page.path} is not published.`
+      `(SEARCH/MEILISEARCH) SKIPPING: Page with path ${page.path} is not published.`,
     );
     return Promise.resolve();
   } else if (page.isPrivate) {
     logger.warn(
-      `(SEARCH/MEILISEARCH) SKIPPING: Page with path ${page.path} is private.`
+      `(SEARCH/MEILISEARCH) SKIPPING: Page with path ${page.path} is private.`,
     );
     return Promise.resolve();
   } else {
@@ -194,7 +194,7 @@ module.exports = {
           results && results.results && Array.isArray(results.results)
             ? results.results.length
             : 0
-        } results.`
+        } results.`,
       );
       results.results = (results.results || []).map((s) => {
         if (s.localeCode) {
@@ -206,7 +206,7 @@ module.exports = {
       return results;
     } catch (err) {
       logger.warn(
-        `(SEARCH/MEILISEARCH) Query failed with error: ${err.message}`
+        `(SEARCH/MEILISEARCH) Query failed with error: ${err.message}`,
       );
       throw err;
     }
@@ -227,7 +227,7 @@ module.exports = {
       return suggestions;
     } catch (err) {
       logger.warn(
-        `(SEARCH/MEILISEARCH) Suggest failed with error: ${err.message}`
+        `(SEARCH/MEILISEARCH) Suggest failed with error: ${err.message}`,
       );
       throw err;
     }
@@ -240,12 +240,12 @@ module.exports = {
   async created(page) {
     await rejectIfIsPrivateAndNotPublished(page, async (page) => {
       logger.info(
-        `(SEARCH/MEILISEARCH) Creating search index for page: ${page.path}`
+        `(SEARCH/MEILISEARCH) Creating search index for page: ${page.path}`,
       );
       const engine = await getSearchEngine(this.config);
       await engine.created(page);
       logger.info(
-        `(SEARCH/MEILISEARCH) Search index created for page: ${page.path}`
+        `(SEARCH/MEILISEARCH) Search index created for page: ${page.path}`,
       );
     });
   },
@@ -257,12 +257,12 @@ module.exports = {
   async updated(page) {
     await rejectIfIsPrivateAndNotPublished(page, async (page) => {
       logger.info(
-        `(SEARCH/MEILISEARCH) Updating search index for page: ${page.path}`
+        `(SEARCH/MEILISEARCH) Updating search index for page: ${page.path}`,
       );
       const engine = await getSearchEngine(this.config);
       await engine.updated(page);
       logger.info(
-        `(SEARCH/MEILISEARCH) Search index updated for page: ${page.path}`
+        `(SEARCH/MEILISEARCH) Search index updated for page: ${page.path}`,
       );
     });
   },
@@ -274,12 +274,12 @@ module.exports = {
   async deleted(page) {
     await rejectIfIsPrivateAndNotPublished(page, async (page) => {
       logger.info(
-        `(SEARCH/MEILISEARCH) Deleting search index for page: ${page.path}`
+        `(SEARCH/MEILISEARCH) Deleting search index for page: ${page.path}`,
       );
       const engine = await getSearchEngine(this.config);
       await engine.deleted(page);
       logger.info(
-        `(SEARCH/MEILISEARCH) Search index deleted for page: ${page.path}`
+        `(SEARCH/MEILISEARCH) Search index deleted for page: ${page.path}`,
       );
     });
   },
@@ -291,12 +291,12 @@ module.exports = {
   async renamed(page) {
     await rejectIfIsPrivateAndNotPublished(page, async (page) => {
       logger.info(
-        `(SEARCH/MEILISEARCH) Renaming search index for page: ${page.path}`
+        `(SEARCH/MEILISEARCH) Renaming search index for page: ${page.path}`,
       );
       const engine = await getSearchEngine(this.config);
       await engine.updated(page);
       logger.info(
-        `(SEARCH/MEILISEARCH) Search index renamed for page: ${page.destinationPath}`
+        `(SEARCH/MEILISEARCH) Search index renamed for page: ${page.destinationPath}`,
       );
     });
   },
@@ -326,7 +326,7 @@ module.exports = {
           "authorId",
           "creatorId",
           "localeCode",
-          { realId: "id" }
+          { realId: "id" },
         )
         .select()
         .from("pages")
@@ -371,7 +371,7 @@ module.exports = {
       logger.info(`(SEARCH/MEILISEARCH) Search index rebuilt successfully.`);
     } catch (err) {
       logger.error(
-        `(SEARCH/MEILISEARCH) Error rebuilding search index: ${err}`
+        `(SEARCH/MEILISEARCH) Error rebuilding search index: ${err}`,
       );
     }
   },
