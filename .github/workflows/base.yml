@@ -77,8 +77,8 @@ jobs:
       - name: Setup Node.js with pnpm
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'pnpm'
+          node-version: "lts/*"
+          cache: "pnpm"
 
       - name: Enable pnpm via corepack
         run: |
@@ -97,7 +97,13 @@ jobs:
       - name: Build dist (rspack)
         env:
           VERSION: ${{ github.sha }}
-        run: pnpm run build
+        run: |
+          pnpm run build:wasm
+          mkdir -p dist/pkg
+          cp -r pkg/* ./dist/pkg/
+          cp ./engine.js ./dist/engine.js
+          cp ./definition.yml ./dist/definition.yml
+          cp ./LICENSE ./dist/LICENSE
 
       - name: Zip dist folder
         run: |
