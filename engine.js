@@ -94,7 +94,7 @@ module.exports = {
    * ACTIVATE
    */
   async activate(opts = {}) {
-    logger.log(`(SEARCH/MEILISEARCH) Activating search engine...`, opts);
+    logger.info(`(SEARCH/MEILISEARCH) Activating search engine...`);
     const engine = await getSearchEngine(this.config);
     logger.info(`(SEARCH/MEILISEARCH) Engine methods: ${Object.keys(engine)}`);
     await engine.activated();
