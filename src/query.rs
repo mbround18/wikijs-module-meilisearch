@@ -5,11 +5,6 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct FacetStats {
-    // Define fields for FacetStats based on your requirements
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SerializableSearchResult {
     pub hits: Vec<WikiPage>,
