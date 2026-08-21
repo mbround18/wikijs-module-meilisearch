@@ -79,5 +79,9 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           gh release upload "$VERSION" meilisearch.zip --clobber
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          # The job-level `contents: write` permission scopes this token —
+          # no custom PAT needed. The previous `secrets.GH_TOKEN` PAT was
+          # failing GitHub's GraphQL API ("unexpected GraphQL response
+          # shape fetching tags"), most likely expired/under-scoped; the
+          # same query succeeds against this repo with a normal token.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
