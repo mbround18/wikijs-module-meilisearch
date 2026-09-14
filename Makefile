@@ -40,7 +40,7 @@ build: clean ## Build the project
 
 dev: build ## Build the project and start development environment
 	@echo "Starting Docker Compose..."
-	# @docker compose -f $(DOCKER_COMPOSE) up --remove-orphans
+	@docker compose -f $(DOCKER_COMPOSE) up --remove-orphans
 
 lint: ## Run linters on the Rust code
 	@echo "Running linters..."
@@ -51,7 +51,7 @@ lint: ## Run linters on the Rust code
 clean: ## Clean up the project
 	@echo "Cleaning up..."
 	@rm -rf $(PKG_DIR)
-	# @docker compose -f $(DOCKER_COMPOSE) down --remove-orphans --volumes
+	@docker compose -f $(DOCKER_COMPOSE) down --remove-orphans --volumes
 
 stop: ## Stop running Docker containers
 	@echo "Stopping Docker Compose..."
