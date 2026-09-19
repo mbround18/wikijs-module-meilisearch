@@ -29,6 +29,7 @@ log = "0.4.34"
 env_logger = "0.11.11"
 glob = "0.3.4"
 regex = "1.13.1"
+gloo-timers = { version = "0.4.0", features = ["futures"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.78"
