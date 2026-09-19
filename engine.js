@@ -51,7 +51,7 @@ let logger = WIKI.logger;
  */
 async function getSearchEngine({
   meilisearchHost,
-  meilisearchMasterKey,
+  meilisearchApiKey,
   indexName,
   timeout,
 }) {
@@ -64,7 +64,7 @@ async function getSearchEngine({
   if (!searchEngine) {
     searchEngine = await new wasm.WikiSearchEngine(
       meilisearchHost || "http://meilisearch:7700",
-      meilisearchMasterKey || "demo",
+      meilisearchApiKey || "demo",
       indexName || "wiki_index",
       BigInt(timeout || 5000),
     );
@@ -94,7 +94,7 @@ module.exports = {
    * ACTIVATE
    */
   async activate(opts = {}) {
-    logger.log(`(SEARCH/MEILISEARCH) Activating search engine...`, opts);
+    logger.info(`(SEARCH/MEILISEARCH) Activating search engine...`, opts);
     const engine = await getSearchEngine(this.config);
     logger.info(`(SEARCH/MEILISEARCH) Engine methods: ${Object.keys(engine)}`);
     await engine.activated();
