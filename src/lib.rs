@@ -113,9 +113,6 @@ impl WikiSearchEngine {
 
     #[wasm_bindgen]
     pub async fn activated(&self) -> Result<(), JsValue> {
-        use std::time::Duration;
-        use tokio::time::sleep;
-
         log::info!("Activating search engine");
         let index_name = &self.base_index_name;
 
@@ -140,17 +137,15 @@ impl WikiSearchEngine {
                 .create_index(index_name, Some("id"))
                 .await
                 .map_err(|e| WikiSearchEngine::log_and_return_js_error("Error creating index", e))
-                .expect("Error creating index")
-                .wait_for_completion(&self.client, None, None)
-                .await
-                .map_err(|e| WikiSearchEngine::log_and_return_js_error("Error creating index", e))
                 .expect("Error creating index");
         }
 
+        use gloo_timers::future::sleep;
+        use std::time::Duration;
+        let delay = Duration::from_millis(300);
         // Retry logic: poll for index readiness
         let mut retries = 0;
         let max_retries = 10;
-        let delay = Duration::from_millis(300);
         loop {
             let mut index = self.client.index(index_name);
             match index.get_primary_key().await {
