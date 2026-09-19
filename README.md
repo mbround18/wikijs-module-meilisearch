@@ -24,7 +24,7 @@ This module is a plugin for the [WikiJS](https://wiki.js.org/) software. It allo
 
 1. Navigate to the latest release of the module on the [releases page](https://github.com/mbround18/wikijs-module-meilisearch/releases).
 2. Download the `meilisearch.zip` file.
-3. Extract the contents of the zip file into the `/wiki/server/modules/meilisearch` directory.
+3. Extract the contents of the zip file into the `/wiki/server/modules/search/meilisearch` directory.
 4. Restart your WikiJS server.
 5. Navigate to your admin panel
 6. Click on the `Search` tab
