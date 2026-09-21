@@ -18,7 +18,7 @@ services:
       - meilisearch
 
   meilisearch:
-    image: getmeili/meilisearch:v1.19
+    image: getmeili/meilisearch:v1.54
     container_name: meilisearch
     restart: always
     user: "${UID}:${GID}"
