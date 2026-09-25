@@ -51,7 +51,9 @@ lint: ## Run linters on the Rust code
 clean: ## Clean up the project
 	@echo "Cleaning up..."
 	@rm -rf $(PKG_DIR)
+ifneq ($(NO_DOCKER),true)
 	@docker compose -f $(DOCKER_COMPOSE) down --remove-orphans --volumes
+endif
 
 stop: ## Stop running Docker containers
 	@echo "Stopping Docker Compose..."
