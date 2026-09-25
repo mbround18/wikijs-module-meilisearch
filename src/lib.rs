@@ -31,6 +31,7 @@ impl WikiSearchEngine {
             .index(index_name)
             .search()
             .with_attributes_to_search_on(&[
+                "path",
                 "title",
                 "description",
                 "content",
