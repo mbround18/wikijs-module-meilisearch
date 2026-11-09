@@ -1,6 +1,6 @@
 services:
   wikijs:
-    image: requarks/wiki:2
+    image: requarks/wiki:3
     container_name: wikijs
     restart: always
     user: "${UID}:${GID}"
